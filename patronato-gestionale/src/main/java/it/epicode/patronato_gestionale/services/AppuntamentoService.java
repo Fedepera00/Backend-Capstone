@@ -20,6 +20,9 @@ public class AppuntamentoService {
     @Autowired
     private AppUserRepository appUserRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public Appuntamento createAppuntamento(String titolo, LocalDateTime dataOra, String luogo, String descrizione, String username) {
         AppUser utente = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
@@ -30,8 +33,23 @@ public class AppuntamentoService {
         appuntamento.setLuogo(luogo);
         appuntamento.setDescrizione(descrizione);
         appuntamento.setUtente(utente);
-        return appuntamentoRepository.save(appuntamento);
+
+        Appuntamento salvato = appuntamentoRepository.save(appuntamento);
+
+        // Invia email al destinatario
+        emailService.sendEmail(
+                utente.getUsername(),
+                "Nuovo Appuntamento Creato",
+                "Ciao " + utente.getUsername() + ",\n\nHai un nuovo appuntamento creato con i seguenti dettagli:\n" +
+                        "Titolo: " + titolo + "\n" +
+                        "Data e Ora: " + dataOra + "\n" +
+                        "Luogo: " + luogo + "\n" +
+                        "Descrizione: " + descrizione + "\n\nGrazie."
+        );
+
+        return salvato;
     }
+
 
     public List<Appuntamento> getAllAppuntamenti() {
         return appuntamentoRepository.findAll();

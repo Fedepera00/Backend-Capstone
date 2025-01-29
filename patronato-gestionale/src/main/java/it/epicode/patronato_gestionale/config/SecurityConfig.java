@@ -1,5 +1,8 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.config;
 
+import it.epicode.patronato_gestionale.auth.CustomUserDetailsService;
+import it.epicode.patronato_gestionale.auth.JwtAuthenticationEntryPoint;
+import it.epicode.patronato_gestionale.auth.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

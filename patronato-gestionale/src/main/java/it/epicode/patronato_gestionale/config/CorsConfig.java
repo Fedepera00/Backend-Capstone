@@ -1,4 +1,4 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
