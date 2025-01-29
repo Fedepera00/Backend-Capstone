@@ -1,5 +1,6 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

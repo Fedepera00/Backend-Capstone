@@ -1,5 +1,6 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 

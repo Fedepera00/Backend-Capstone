@@ -1,4 +1,4 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.enums;
 
 public enum Role {
     ROLE_ADMIN,

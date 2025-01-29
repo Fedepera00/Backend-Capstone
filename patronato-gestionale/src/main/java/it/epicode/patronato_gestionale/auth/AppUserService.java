@@ -1,5 +1,6 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

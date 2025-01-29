@@ -21,6 +21,14 @@ public class Pratica {
     private String descrizione;
 
     @Column(nullable = false)
+    private String richiedente;
+
+    @Column(nullable = false)
+    private String categoria;
+
+    private String note;
+
+    @Column(nullable = false)
     private LocalDate dataCreazione;
 
     @Enumerated(EnumType.STRING)

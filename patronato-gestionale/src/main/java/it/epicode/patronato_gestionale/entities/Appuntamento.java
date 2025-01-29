@@ -23,6 +23,8 @@ public class Appuntamento {
     @Column(nullable = false)
     private String luogo;
 
+    private String descrizione;
+
     @ManyToOne
     private AppUser utente;
 }
