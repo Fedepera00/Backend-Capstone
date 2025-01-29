@@ -22,11 +22,13 @@ public class AuthController {
         appUserService.registerUser(
                 registerRequest.getUsername(),
                 registerRequest.getPassword(),
-                Set.of(Role.ROLE_COLLABORATOR) // Assegna il ruolo di default
+                registerRequest.getEmail(),    // Passiamo l'email
+                registerRequest.getNome(),     // Passiamo il nome
+                registerRequest.getCognome(),  // Passiamo il cognome
+                Set.of(Role.ROLE_COLLABORATOR)         // Ruolo predefinito
         );
         return ResponseEntity.ok("Registrazione avvenuta con successo");
     }
-
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
         String token = appUserService.authenticateUser(

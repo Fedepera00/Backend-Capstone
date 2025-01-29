@@ -20,10 +20,10 @@ public class Pratica {
     @Column(nullable = false)
     private String descrizione;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'Anonimo'")
     private String richiedente;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'Altro'")
     private String categoria;
 
     private String note;

@@ -10,19 +10,15 @@ import java.util.Set;
 @Table(name = "users")
 @Data
 public class AppUser {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String username;
-
-    @Column(nullable = false)
     private String password;
-
+    private String email;
+    private String nome;
+    private String cognome;
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-
 }
