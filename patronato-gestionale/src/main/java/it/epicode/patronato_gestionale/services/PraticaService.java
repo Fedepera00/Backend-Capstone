@@ -17,16 +17,17 @@ public class PraticaService {
     @Autowired
     private PraticaRepository praticaRepository;
 
-    public Pratica createPratica(String titolo, String descrizione, String richiedente, String codiceFiscale, String categoria, String note) {
+    public Pratica createPratica(String titolo, String descrizione, String richiedente, String codiceFiscale, String categoria, String note, StatoPratica stato) {
         Pratica pratica = new Pratica();
         pratica.setTitolo(titolo);
         pratica.setDescrizione(descrizione);
         pratica.setRichiedente(richiedente);
-        pratica.setCodiceFiscale(codiceFiscale); // Assicurati di settare il valore
+        pratica.setCodiceFiscale(codiceFiscale);
         pratica.setCategoria(categoria);
         pratica.setNote(note);
+        pratica.setStato(stato); // Imposta lo stato
         pratica.setDataCreazione(LocalDate.now());
-        pratica.setStato(StatoPratica.IN_ATTESA);
+        pratica.setUltimaModifica(LocalDateTime.now());
         return praticaRepository.save(pratica);
     }
     public List<Pratica> getAllPratiche() {

@@ -21,16 +21,21 @@ public class PraticaController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @PostMapping
-    public ResponseEntity<Pratica> createPratica(@RequestBody @Valid PraticaRequest praticaRequest) {
-        Pratica pratica = praticaService.createPratica(
-                praticaRequest.getTitolo(),
-                praticaRequest.getDescrizione(),
-                praticaRequest.getRichiedente(),
-                praticaRequest.getCodiceFiscale(), // Passa il codice fiscale
-                praticaRequest.getCategoria(),
-                praticaRequest.getNote()
-        );
-        return ResponseEntity.ok(pratica);
+    public ResponseEntity<?> createPratica(@Valid @RequestBody PraticaRequest praticaRequest) {
+        try {
+            Pratica nuovaPratica = praticaService.createPratica(
+                    praticaRequest.getTitolo(),
+                    praticaRequest.getDescrizione(),
+                    praticaRequest.getRichiedente(),
+                    praticaRequest.getCodiceFiscale(),
+                    praticaRequest.getCategoria(),
+                    praticaRequest.getNote(),
+                    StatoPratica.valueOf(praticaRequest.getStato()) // Converti lo stato in enum
+            );
+            return ResponseEntity.ok(nuovaPratica);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body("Stato non valido: " + praticaRequest.getStato());
+        }
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
