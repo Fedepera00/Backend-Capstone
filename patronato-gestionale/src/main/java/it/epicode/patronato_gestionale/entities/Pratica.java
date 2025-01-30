@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -20,10 +21,13 @@ public class Pratica {
     @Column(nullable = false)
     private String descrizione;
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'Anonimo'")
+    @Column(nullable = false)
     private String richiedente;
 
-    @Column(nullable = false, columnDefinition = "varchar(255) default 'Altro'")
+    @Column(nullable = false)
+    private String codiceFiscale;
+
+    @Column(nullable = false)
     private String categoria;
 
     private String note;
@@ -31,6 +35,10 @@ public class Pratica {
     @Column(nullable = false)
     private LocalDate dataCreazione;
 
+    @Column(nullable = false)
+    private LocalDateTime ultimaModifica;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private StatoPratica stato;
 }
