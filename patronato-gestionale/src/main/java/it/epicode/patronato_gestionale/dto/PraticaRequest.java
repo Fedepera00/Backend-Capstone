@@ -9,4 +9,5 @@ public class PraticaRequest {
     private String richiedente;
     private String categoria;
     private String note;
+    private String Stato;
 }

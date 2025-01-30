@@ -47,9 +47,8 @@ public class PraticaController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')") // Solo admin può aggiornare
     @PutMapping("/{id}")
-    public ResponseEntity<Pratica> updatePratica(@PathVariable Long id, @RequestParam String titolo,
-                                                 @RequestParam String descrizione, @RequestParam StatoPratica stato) {
-        Pratica pratica = praticaService.updatePratica(id, titolo, descrizione, stato);
+    public ResponseEntity<Pratica> updatePratica(@PathVariable Long id, @RequestBody PraticaRequest request) {
+        Pratica pratica = praticaService.updatePratica(id, request.getTitolo(), request.getDescrizione(), StatoPratica.valueOf(request.getStato()));
         return ResponseEntity.ok(pratica);
     }
 
