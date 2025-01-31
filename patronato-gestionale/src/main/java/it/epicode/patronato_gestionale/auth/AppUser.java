@@ -13,7 +13,7 @@ public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username; // Campo richiesto per findByUsername
+    private String username;
     private String password;
     private String email;
     private String nome;

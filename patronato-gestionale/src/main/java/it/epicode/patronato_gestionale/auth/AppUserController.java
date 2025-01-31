@@ -2,6 +2,7 @@ package it.epicode.patronato_gestionale.auth;
 
 import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,20 @@ public class AppUserController {
         List<AppUser> users = appUserRepository.findAll();
         return ResponseEntity.ok(users);
     }
-
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AppUser> getLoggedUser(Authentication authentication) {
+        try {
+            System.out.println("Authentication: " + authentication);
+            String username = authentication.getName(); // Ottiene lo username dal token
+            System.out.println("Username: " + username);
+            AppUser user = appUserService.loadUserByUsername(username);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            System.err.println("Errore durante il recupero del profilo utente: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
     // Endpoint per creare un nuovo utente (solo Admin)
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -96,6 +110,32 @@ public class AppUserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
             System.err.println("Errore durante l'aggiornamento del ruolo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    // Endpoint per aggiornare i dettagli dell'utente loggato
+    @PutMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AppUser> updateLoggedUser(Authentication authentication, @RequestBody AppUser updatedUser) {
+        try {
+            String username = authentication.getName(); // Ottiene lo username dal token
+            System.out.println("Username autenticato: " + username);
+            System.out.println("Dati ricevuti dal frontend: " + updatedUser);
+
+            AppUser existingUser = appUserService.loadUserByUsername(username);
+
+            // Aggiorna solo i campi consentiti
+            existingUser.setNome(updatedUser.getNome());
+            existingUser.setCognome(updatedUser.getCognome());
+            existingUser.setEmail(updatedUser.getEmail());
+
+            // Salva l'utente aggiornato
+            AppUser savedUser = appUserRepository.save(existingUser);
+            System.out.println("Dati salvati nel database: " + savedUser);
+
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'aggiornamento del profilo: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

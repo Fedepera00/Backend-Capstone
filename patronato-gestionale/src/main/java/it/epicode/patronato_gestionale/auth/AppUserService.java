@@ -62,10 +62,10 @@ public class AppUserService {
     }
 
     public AppUser loadUserByUsername(String username) {
+        System.out.println("Caricamento utente con username: " + username);
         return appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
     }
-
     public AppUser updateUserRole(Long id, Role nuovoRuolo) {
         AppUser appUser = appUserRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
@@ -92,5 +92,20 @@ public class AppUserService {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
         return appUserRepository.save(existingUser);
+    }
+    public AppUser updateUserDetailsByUsername(String username, AppUser updatedUser) {
+        AppUser appUser = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
+
+        appUser.setNome(updatedUser.getNome());
+        appUser.setCognome(updatedUser.getCognome());
+        appUser.setEmail(updatedUser.getEmail());
+
+        // Solo se la password è fornita, la aggiorniamo
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            appUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        return appUserRepository.save(appUser);
     }
 }
