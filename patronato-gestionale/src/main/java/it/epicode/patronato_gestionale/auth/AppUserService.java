@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,25 +49,35 @@ public class AppUserService {
         return appUserRepository.findByUsername(username);
     }
 
-    public String authenticateUser(String username, String password)  {
+    public String authenticateUser(String username, String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
-
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return jwtTokenUtil.generateToken(userDetails);
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
             throw new SecurityException("Credenziali non valide", e);
         }
     }
 
+    public AppUser loadUserByUsername(String username) {
+        return appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
+    }
 
-    public AppUser loadUserByUsername(String username)  {
-        AppUser appUser = appUserRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
+    public AppUser updateUserRole(Long id, Role nuovoRuolo) {
+        AppUser appUser = appUserRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
+        appUser.getRoles().clear(); // Rimuovi i vecchi ruoli
+        appUser.getRoles().add(nuovoRuolo); // Assegna il nuovo ruolo
+        return appUserRepository.save(appUser);
+    }
 
-
-        return appUser;
+    public void deleteUser(Long id) {
+        if (!appUserRepository.existsById(id)) {
+            throw new EntityNotFoundException("Utente non trovato con ID: " + id);
+        }
+        appUserRepository.deleteById(id);
     }
 }

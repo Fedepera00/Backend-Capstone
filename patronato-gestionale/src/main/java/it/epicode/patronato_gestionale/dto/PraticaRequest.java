@@ -26,5 +26,5 @@ public class PraticaRequest {
     private String note;
 
     @NotBlank(message = "Lo stato è obbligatorio")
-    private String stato; // Aggiunto il campo stato
+    private String stato;
 }

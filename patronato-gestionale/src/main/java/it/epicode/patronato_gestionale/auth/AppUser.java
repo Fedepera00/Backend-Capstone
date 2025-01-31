@@ -13,11 +13,12 @@ public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
+    private String username; // Campo richiesto per findByUsername
     private String password;
     private String email;
     private String nome;
     private String cognome;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
