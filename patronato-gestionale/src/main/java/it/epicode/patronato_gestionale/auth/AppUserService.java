@@ -80,4 +80,17 @@ public class AppUserService {
         }
         appUserRepository.deleteById(id);
     }
+    public AppUser updateUserDetails(Long id, AppUser updatedUser) {
+        AppUser existingUser = appUserRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
+
+        existingUser.setNome(updatedUser.getNome());
+        existingUser.setCognome(updatedUser.getCognome());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setUsername(updatedUser.getUsername());
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+        return appUserRepository.save(existingUser);
+    }
 }

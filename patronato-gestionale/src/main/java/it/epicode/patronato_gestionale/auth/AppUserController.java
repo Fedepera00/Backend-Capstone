@@ -1,6 +1,7 @@
 package it.epicode.patronato_gestionale.auth;
 
 import it.epicode.patronato_gestionale.enums.Role;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class AppUserController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AppUser> createUser(@RequestBody AppUser user) {
-        System.out.println(user);
+        try {
             AppUser nuovoUtente = appUserService.registerUser(
                     user.getUsername(),
                     user.getPassword(),
@@ -42,44 +43,77 @@ public class AppUserController {
                     user.getRoles()
             );
             return new ResponseEntity<>(nuovoUtente, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace(); // Logga l'errore per debugging
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 
-
+    // Endpoint per aggiornare i dettagli di un utente (solo Admin)
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<AppUser> updateUser(
+            @PathVariable Long id,
+            @RequestBody AppUser updatedUser) {
+        try {
+            System.out.println("Aggiornamento utente ID: " + id); // Debug
+            System.out.println("Nuovi dettagli utente: " + updatedUser); // Debug
+            AppUser utenteAggiornato = appUserService.updateUserDetails(id, updatedUser);
+            return ResponseEntity.ok(utenteAggiornato);
+        } catch (EntityNotFoundException e) {
+            System.err.println("Errore: Utente non trovato con ID " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            System.err.println("Errore generico: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // Endpoint per aggiornare il ruolo di un utente (solo Admin)
+// Endpoint per aggiornare il ruolo di un utente (solo Admin)
     @PutMapping("/{id}/ruolo")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AppUser> updateRole(
             @PathVariable Long id,
             @RequestBody Map<String, String> payload) {
         try {
-            // Verifica che il ruolo sia presente nel payload
+            // Verifica che il payload contenga il ruolo
             String nuovoRuolo = payload.get("ruolo");
-            if (!nuovoRuolo.equals("ROLE_ADMIN") && !nuovoRuolo.equals("ROLE_COLLABORATOR")) {
-                throw new IllegalArgumentException("Ruolo non valido");
+            if (nuovoRuolo == null || (!nuovoRuolo.equals("ROLE_ADMIN") && !nuovoRuolo.equals("ROLE_COLLABORATOR"))) {
+                throw new IllegalArgumentException("Ruolo non valido: " + nuovoRuolo);
             }
-            System.out.println("Payload ricevuto: " + payload);
+
+            // Converti il ruolo in un valore dell'enum
             Role ruoloEnum = Role.valueOf(nuovoRuolo);
             AppUser utenteAggiornato = appUserService.updateUserRole(id, ruoloEnum);
             return ResponseEntity.ok(utenteAggiornato);
         } catch (IllegalArgumentException e) {
             System.err.println("Ruolo non valido: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } catch (Exception e) {
-            System.err.println("Errore generico: " + e.getMessage());
+        } catch (EntityNotFoundException e) {
+            System.err.println("Utente non trovato: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            System.err.println("Errore durante l'aggiornamento del ruolo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
     // Endpoint per eliminare un utente (solo Admin)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
+            System.out.println("Eliminazione utente ID: " + id); // Debug
             appUserService.deleteUser(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
+        } catch (EntityNotFoundException e) {
+            System.err.println("Errore: Utente non trovato con ID " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            System.err.println("Errore generico: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
