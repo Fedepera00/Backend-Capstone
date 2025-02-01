@@ -40,7 +40,7 @@ public class AppUserService {
         appUser.setEmail(email);
         appUser.setNome(nome);
         appUser.setCognome(cognome);
-        appUser.setRoles(roles);
+        appUser.setRoles(roles); // Assicurati che roles non sia null
 
         return appUserRepository.save(appUser);
     }

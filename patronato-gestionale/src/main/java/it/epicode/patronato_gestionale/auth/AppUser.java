@@ -20,6 +20,7 @@ public class AppUser {
     private String cognome;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "app_user_roles", joinColumns = @JoinColumn(name = "app_user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 }

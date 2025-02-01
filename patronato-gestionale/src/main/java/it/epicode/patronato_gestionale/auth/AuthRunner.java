@@ -21,29 +21,25 @@ public class AuthRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // Creazione dell'utente admin
-        Optional<AppUser> adminUser = appUserService.findByUsername("admin");
-        if (adminUser.isEmpty()) {
+        if (appUserService.findByUsername("admin").isEmpty()) {
             appUserService.registerUser(
                     "admin",
                     "adminpwd",
                     "admin@example.com",
                     "Admin",
                     "Superuser",
-                    Set.of(Role.ROLE_ADMIN)
+                    Set.of(Role.ROLE_ADMIN) // Passa i ruoli corretti
             );
         }
 
-        // Creazione dell'utente collaboratore
-        Optional<AppUser> collaboratorUser = appUserService.findByUsername("collaborator");
-        if (collaboratorUser.isEmpty()) {
+        if (appUserService.findByUsername("collaborator").isEmpty()) {
             appUserService.registerUser(
                     "collaborator",
                     "collaboratorpwd",
                     "collaborator@example.com",
                     "Collaboratore",
                     "Aziendale",
-                    Set.of(Role.ROLE_COLLABORATOR)
+                    Set.of(Role.ROLE_COLLABORATOR) // Passa i ruoli corretti
             );
         }
     }
