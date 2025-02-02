@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 @Data
 public class AppuntamentoRequest {
-    private String titolo;
+    private String titolo; // Campo obbligatorio
     private LocalDateTime dataOra;
     private String luogo;
     private String descrizione;
-    private String username; // Username dell'utente associato
+    private String username;
 }
