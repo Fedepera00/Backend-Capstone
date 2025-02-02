@@ -26,5 +26,6 @@ public class Appuntamento {
     private String descrizione;
 
     @ManyToOne
+    @JoinColumn(name = "utente_id", nullable = false)
     private AppUser utente;
 }

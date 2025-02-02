@@ -30,6 +30,7 @@ public class AppuntamentoController {
         );
         return ResponseEntity.ok(appuntamento);
     }
+
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @GetMapping
     public ResponseEntity<List<Appuntamento>> getAllAppuntamenti() {
@@ -37,14 +38,7 @@ public class AppuntamentoController {
         return ResponseEntity.ok(appuntamenti);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
-    @GetMapping("/{id}")
-    public ResponseEntity<Appuntamento> getAppuntamentoById(@PathVariable Long id) {
-        Appuntamento appuntamento = appuntamentoService.getAppuntamentoById(id);
-        return ResponseEntity.ok(appuntamento);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')") // Solo admin può aggiornare
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Appuntamento> updateAppuntamento(@PathVariable Long id, @RequestParam String titolo,
                                                            @RequestParam LocalDateTime dataOra,
@@ -53,7 +47,7 @@ public class AppuntamentoController {
         return ResponseEntity.ok(appuntamento);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')") // Solo admin può eliminare
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppuntamento(@PathVariable Long id) {
         appuntamentoService.deleteAppuntamento(id);

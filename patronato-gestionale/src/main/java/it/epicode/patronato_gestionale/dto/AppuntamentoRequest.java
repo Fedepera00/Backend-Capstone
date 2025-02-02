@@ -9,6 +9,6 @@ public class AppuntamentoRequest {
     private String titolo;
     private LocalDateTime dataOra;
     private String luogo;
-    private String descrizione; // Descrizione dell'appuntamento
-    private String username;    // Username dell'utente associato
+    private String descrizione;
+    private String username; // Username dell'utente associato
 }
