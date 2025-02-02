@@ -25,6 +25,12 @@ public class Appuntamento {
 
     private String descrizione;
 
+    @Column(nullable = false)
+    private String nome; // Campo aggiunto
+
+    @Column(nullable = false)
+    private String cognome; // Campo aggiunto
+
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)
     private AppUser utente;

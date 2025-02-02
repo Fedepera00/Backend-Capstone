@@ -20,7 +20,7 @@ public class AppuntamentoService {
     @Autowired
     private AppUserRepository appUserRepository;
 
-    public Appuntamento createAppuntamento(String titolo, LocalDateTime dataOra, String luogo, String descrizione, String username) {
+    public Appuntamento createAppuntamento(String titolo, LocalDateTime dataOra, String luogo, String descrizione, String nome, String cognome, String username) {
         AppUser utente = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
 
@@ -29,6 +29,8 @@ public class AppuntamentoService {
         appuntamento.setDataOra(dataOra);
         appuntamento.setLuogo(luogo);
         appuntamento.setDescrizione(descrizione);
+        appuntamento.setNome(nome); // Imposta il nome
+        appuntamento.setCognome(cognome); // Imposta il cognome
         appuntamento.setUtente(utente);
 
         return appuntamentoRepository.save(appuntamento);
@@ -43,11 +45,13 @@ public class AppuntamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Appuntamento non trovato con ID: " + id));
     }
 
-    public Appuntamento updateAppuntamento(Long id, String titolo, LocalDateTime dataOra, String luogo) {
+    public Appuntamento updateAppuntamento(Long id, String titolo, LocalDateTime dataOra, String luogo, String nome, String cognome) {
         Appuntamento appuntamento = getAppuntamentoById(id);
         appuntamento.setTitolo(titolo);
         appuntamento.setDataOra(dataOra);
         appuntamento.setLuogo(luogo);
+        appuntamento.setNome(nome); // Aggiorna il nome
+        appuntamento.setCognome(cognome); // Aggiorna il cognome
         return appuntamentoRepository.save(appuntamento);
     }
 
