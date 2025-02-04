@@ -53,17 +53,20 @@ public class AppuntamentoController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<Appuntamento> updateAppuntamento(@PathVariable Long id,
-                                                           @RequestParam String titolo,
-                                                           @RequestParam LocalDateTime dataOra,
-                                                           @RequestParam String luogo,
-                                                           @RequestParam String nome,
-                                                           @RequestParam String cognome,
-                                                           @RequestParam String stato) {
-        Appuntamento appuntamento = appuntamentoService.updateAppuntamento(id, titolo, dataOra, luogo, nome, cognome, stato);
+    public ResponseEntity<Appuntamento> updateAppuntamento(
+            @PathVariable Long id,
+            @RequestBody AppuntamentoRequest appuntamentoRequest) {
+        Appuntamento appuntamento = appuntamentoService.updateAppuntamento(
+                id,
+                appuntamentoRequest.getTitolo(),
+                appuntamentoRequest.getDataOra(),
+                appuntamentoRequest.getLuogo(),
+                appuntamentoRequest.getNome(),
+                appuntamentoRequest.getCognome(),
+                appuntamentoRequest.getStato()
+        );
         return ResponseEntity.ok(appuntamento);
     }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppuntamento(@PathVariable Long id) {
