@@ -10,6 +10,7 @@ public class AppuntamentoRequest {
     private LocalDateTime dataOra;
     private String luogo;
     private String descrizione;
-    private String nome; // Campo aggiunto
-    private String cognome; // Campo aggiunto
+    private String nome;
+    private String cognome;
+    private String stato; // Nuovo campo per lo stato
 }

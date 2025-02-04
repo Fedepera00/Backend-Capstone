@@ -26,10 +26,13 @@ public class Appuntamento {
     private String descrizione;
 
     @Column(nullable = false)
-    private String nome; // Campo aggiunto
+    private String nome;
 
     @Column(nullable = false)
-    private String cognome; // Campo aggiunto
+    private String cognome;
+
+    @Column(nullable = false)
+    private String stato;
 
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)

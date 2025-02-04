@@ -35,6 +35,7 @@ public class AppuntamentoController {
                 appuntamentoRequest.getDescrizione(),
                 appuntamentoRequest.getNome(),
                 appuntamentoRequest.getCognome(),
+                appuntamentoRequest.getStato(),
                 username
         );
         return ResponseEntity.ok(appuntamento);
@@ -42,8 +43,11 @@ public class AppuntamentoController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @GetMapping
-    public ResponseEntity<List<Appuntamento>> getAllAppuntamenti() {
-        List<Appuntamento> appuntamenti = appuntamentoService.getAllAppuntamenti();
+    public ResponseEntity<List<Appuntamento>> getAllAppuntamenti(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String cognome,
+            @RequestParam(required = false) String stato) {
+        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato);
         return ResponseEntity.ok(appuntamenti);
     }
 
@@ -54,8 +58,9 @@ public class AppuntamentoController {
                                                            @RequestParam LocalDateTime dataOra,
                                                            @RequestParam String luogo,
                                                            @RequestParam String nome,
-                                                           @RequestParam String cognome) {
-        Appuntamento appuntamento = appuntamentoService.updateAppuntamento(id, titolo, dataOra, luogo, nome, cognome);
+                                                           @RequestParam String cognome,
+                                                           @RequestParam String stato) {
+        Appuntamento appuntamento = appuntamentoService.updateAppuntamento(id, titolo, dataOra, luogo, nome, cognome, stato);
         return ResponseEntity.ok(appuntamento);
     }
 
