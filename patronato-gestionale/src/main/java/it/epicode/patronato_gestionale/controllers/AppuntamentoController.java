@@ -4,7 +4,6 @@ import it.epicode.patronato_gestionale.dto.AppuntamentoRequest;
 import it.epicode.patronato_gestionale.entities.Appuntamento;
 import it.epicode.patronato_gestionale.services.AppuntamentoService;
 import it.epicode.patronato_gestionale.auth.JwtTokenUtil;
-import it.epicode.patronato_gestionale.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,25 +22,6 @@ public class AppuntamentoController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private EmailService emailService;
-
-    @GetMapping("/test-email")
-    public ResponseEntity<String> testEmail() {
-        try {
-            System.out.println("Tentativo di invio email di test...");
-            emailService.sendEmail(
-                    System.getenv("MAIL_DESTINATARIO"),
-                    "Test Email",
-                    "Questa è un'email di prova dal sistema Patronato Gestionale."
-            );
-            System.out.println("Email di test inviata con successo!");
-            return ResponseEntity.ok("Email inviata con successo!");
-        } catch (Exception e) {
-            System.err.println("Errore durante l'invio dell'email di test: " + e.getMessage());
-            return ResponseEntity.status(500).body("Errore durante l'invio dell'email: " + e.getMessage());
-        }
-    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @PostMapping
@@ -75,11 +55,16 @@ public class AppuntamentoController {
     public ResponseEntity<List<Appuntamento>> getAllAppuntamenti(
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String cognome,
-            @RequestParam(required = false) String stato) {
+            @RequestParam(required = false) String stato,
+            @RequestParam(required = false) LocalDateTime startDate,
+            @RequestParam(required = false) LocalDateTime endDate) {
         System.out.println("Richiesta per ottenere tutti gli appuntamenti.");
         System.out.println("Filtri applicati - Nome: " + nome + ", Cognome: " + cognome + ", Stato: " + stato);
+        if (startDate != null && endDate != null) {
+            System.out.println("Filtri aggiuntivi - Data inizio: " + startDate + ", Data fine: " + endDate);
+        }
 
-        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato);
+        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato, startDate, endDate);
         System.out.println("Numero di appuntamenti trovati: " + appuntamenti.size());
 
         return ResponseEntity.ok(appuntamenti);

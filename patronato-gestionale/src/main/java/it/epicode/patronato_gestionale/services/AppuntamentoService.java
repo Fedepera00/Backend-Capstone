@@ -51,25 +51,22 @@ public class AppuntamentoService {
         return savedAppuntamento;
     }
 
-    public List<Appuntamento> filterAppuntamenti(String nome, String cognome, String stato) {
-        List<Appuntamento> appuntamenti = appuntamentoRepository.findAll();
-
-        if (nome != null) {
-            appuntamenti = appuntamenti.stream()
-                    .filter(a -> a.getNome().equalsIgnoreCase(nome))
-                    .collect(Collectors.toList());
+    public List<Appuntamento> filterAppuntamenti(String nome, String cognome, String stato, LocalDateTime startDate, LocalDateTime endDate) {
+        if (startDate != null && endDate != null) {
+            return appuntamentoRepository.findByNomeIgnoreCaseContainingAndCognomeIgnoreCaseContainingAndStatoIgnoreCaseContainingAndDataOraBetween(
+                    nome != null ? nome : "",
+                    cognome != null ? cognome : "",
+                    stato != null ? stato : "",
+                    startDate,
+                    endDate
+            );
+        } else {
+            return appuntamentoRepository.findByNomeIgnoreCaseContainingAndCognomeIgnoreCaseContainingAndStatoIgnoreCaseContaining(
+                    nome != null ? nome : "",
+                    cognome != null ? cognome : "",
+                    stato != null ? stato : ""
+            );
         }
-        if (cognome != null) {
-            appuntamenti = appuntamenti.stream()
-                    .filter(a -> a.getCognome().equalsIgnoreCase(cognome))
-                    .collect(Collectors.toList());
-        }
-        if (stato != null) {
-            appuntamenti = appuntamenti.stream()
-                    .filter(a -> a.getStato().equalsIgnoreCase(stato))
-                    .collect(Collectors.toList());
-        }
-        return appuntamenti;
     }
 
     public Appuntamento updateAppuntamento(Long id, String titolo, LocalDateTime dataOra, String luogo,
@@ -107,6 +104,6 @@ public class AppuntamentoService {
         String subject = "Cancellazione Appuntamento: " + appuntamento.getTitolo();
         String body = String.format("Ciao %s,\n\nIl tuo appuntamento per il %s alle ore %s presso %s è stato cancellato.\n\nGrazie, \nPatronato Gestionale",
                 appuntamento.getNome(), appuntamento.getDataOra().toLocalDate(), appuntamento.getDataOra().toLocalTime(), appuntamento.getLuogo());
-        emailService.sendEmail(appuntamento.getUtente().getEmail(), subject, body);
+        emailService.sendEmail(appuntamento.getEmail(), subject, body);
     }
 }

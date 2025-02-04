@@ -11,4 +11,7 @@ import java.util.List;
 public interface AppuntamentoRepository extends JpaRepository<Appuntamento, Long> {
     // Trova appuntamenti tra due date specifiche
     List<Appuntamento> findByDataOraBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<Appuntamento> findByNomeIgnoreCaseContainingAndCognomeIgnoreCaseContainingAndStatoIgnoreCaseContaining(String nome, String cognome, String stato);
+
+    List<Appuntamento> findByNomeIgnoreCaseContainingAndCognomeIgnoreCaseContainingAndStatoIgnoreCaseContainingAndDataOraBetween(String nome, String cognome, String stato, LocalDateTime startDate, LocalDateTime endDate);
 }
