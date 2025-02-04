@@ -3,7 +3,6 @@ package it.epicode.patronato_gestionale.entities;
 import it.epicode.patronato_gestionale.auth.AppUser;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,6 +32,9 @@ public class Appuntamento {
 
     @Column(nullable = false)
     private String stato;
+
+    @Column(nullable = false)
+    private String email; // Aggiunto per inviare email di notifica
 
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)

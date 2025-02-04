@@ -1,7 +1,6 @@
 package it.epicode.patronato_gestionale.dto;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data
@@ -12,5 +11,6 @@ public class AppuntamentoRequest {
     private String descrizione;
     private String nome;
     private String cognome;
-    private String stato; // Nuovo campo per lo stato
+    private String stato;
+    private String email; // Campo necessario
 }

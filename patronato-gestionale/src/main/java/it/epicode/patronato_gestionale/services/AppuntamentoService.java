@@ -21,7 +21,11 @@ public class AppuntamentoService {
     @Autowired
     private AppUserRepository appUserRepository;
 
-    public Appuntamento createAppuntamento(String titolo, LocalDateTime dataOra, String luogo, String descrizione, String nome, String cognome, String stato, String username) {
+    @Autowired
+    private EmailService emailService;
+
+    public Appuntamento createAppuntamento(String titolo, LocalDateTime dataOra, String luogo, String descrizione,
+                                           String nome, String cognome, String stato, String email, String username) {
         AppUser utente = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
 
@@ -33,9 +37,18 @@ public class AppuntamentoService {
         appuntamento.setNome(nome);
         appuntamento.setCognome(cognome);
         appuntamento.setStato(stato);
+        appuntamento.setEmail(email);
         appuntamento.setUtente(utente);
 
-        return appuntamentoRepository.save(appuntamento);
+        Appuntamento savedAppuntamento = appuntamentoRepository.save(appuntamento);
+
+        // Invio email
+        String subject = "Conferma Appuntamento: " + titolo;
+        String body = String.format("Ciao %s,\n\nIl tuo appuntamento è stato confermato per il %s alle ore %s presso %s.\n\nDescrizione: %s\n\nGrazie, \nPatronato Gestionale",
+                nome, dataOra.toLocalDate(), dataOra.toLocalTime(), luogo, descrizione);
+        emailService.sendEmail(email, subject, body);
+
+        return savedAppuntamento;
     }
 
     public List<Appuntamento> filterAppuntamenti(String nome, String cognome, String stato) {
@@ -59,7 +72,8 @@ public class AppuntamentoService {
         return appuntamenti;
     }
 
-    public Appuntamento updateAppuntamento(Long id, String titolo, LocalDateTime dataOra, String luogo, String nome, String cognome, String stato) {
+    public Appuntamento updateAppuntamento(Long id, String titolo, LocalDateTime dataOra, String luogo,
+                                           String nome, String cognome, String stato, String email) {
         Appuntamento appuntamento = getAppuntamentoById(id);
         appuntamento.setTitolo(titolo);
         appuntamento.setDataOra(dataOra);
@@ -67,7 +81,17 @@ public class AppuntamentoService {
         appuntamento.setNome(nome);
         appuntamento.setCognome(cognome);
         appuntamento.setStato(stato);
-        return appuntamentoRepository.save(appuntamento);
+        appuntamento.setEmail(email);
+
+        Appuntamento updatedAppuntamento = appuntamentoRepository.save(appuntamento);
+
+        // Invio email
+        String subject = "Aggiornamento Appuntamento: " + titolo;
+        String body = String.format("Ciao %s,\n\nIl tuo appuntamento è stato aggiornato:\n\nData: %s\nOrario: %s\nLuogo: %s\nStato: %s\n\nGrazie, \nPatronato Gestionale",
+                nome, dataOra.toLocalDate(), dataOra.toLocalTime(), luogo, stato);
+        emailService.sendEmail(email, subject, body);
+
+        return updatedAppuntamento;
     }
 
     public Appuntamento getAppuntamentoById(Long id) {
@@ -76,6 +100,13 @@ public class AppuntamentoService {
     }
 
     public void deleteAppuntamento(Long id) {
+        Appuntamento appuntamento = getAppuntamentoById(id);
         appuntamentoRepository.deleteById(id);
+
+        // Invio email di cancellazione
+        String subject = "Cancellazione Appuntamento: " + appuntamento.getTitolo();
+        String body = String.format("Ciao %s,\n\nIl tuo appuntamento per il %s alle ore %s presso %s è stato cancellato.\n\nGrazie, \nPatronato Gestionale",
+                appuntamento.getNome(), appuntamento.getDataOra().toLocalDate(), appuntamento.getDataOra().toLocalTime(), appuntamento.getLuogo());
+        emailService.sendEmail(appuntamento.getUtente().getEmail(), subject, body);
     }
 }
