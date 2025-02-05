@@ -56,15 +56,22 @@ public class AppuntamentoController {
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) String cognome,
             @RequestParam(required = false) String stato,
-            @RequestParam(required = false) LocalDateTime startDate,
-            @RequestParam(required = false) LocalDateTime endDate) {
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
         System.out.println("Richiesta per ottenere tutti gli appuntamenti.");
         System.out.println("Filtri applicati - Nome: " + nome + ", Cognome: " + cognome + ", Stato: " + stato);
+
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+
+        // Converte le stringhe in LocalDateTime, se presenti
         if (startDate != null && endDate != null) {
-            System.out.println("Filtri aggiuntivi - Data inizio: " + startDate + ", Data fine: " + endDate);
+            startDateTime = LocalDateTime.parse(startDate);
+            endDateTime = LocalDateTime.parse(endDate);
+            System.out.println("Filtri aggiuntivi - Data inizio: " + startDateTime + ", Data fine: " + endDateTime);
         }
 
-        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato, startDate, endDate);
+        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato, startDateTime, endDateTime);
         System.out.println("Numero di appuntamenti trovati: " + appuntamenti.size());
 
         return ResponseEntity.ok(appuntamenti);
