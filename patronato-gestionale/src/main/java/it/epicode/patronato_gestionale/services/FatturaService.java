@@ -27,7 +27,6 @@ public class FatturaService {
                 .orElseThrow(() -> new EntityNotFoundException("Fattura non trovata con ID: " + id));
     }
 
-    // 🔹 **Crea una nuova fattura**
     @Transactional
     public Fattura createFattura(FatturaRequest request) {
         if (fatturaRepository.existsByNumero(request.getNumero())) {
@@ -39,11 +38,16 @@ public class FatturaService {
         fattura.setDataEmissione(request.getDataEmissione() != null ? request.getDataEmissione() : LocalDate.now());
         fattura.setImporto(request.getImporto());
         fattura.setDescrizione(request.getDescrizione());
+        fattura.setNome(request.getNome());
+        fattura.setCognome(request.getCognome());
+        fattura.setCodiceFiscale(request.getCodiceFiscale());
+        fattura.setIndirizzo(request.getIndirizzo());
+        fattura.setTelefono(request.getTelefono());
+        fattura.setEmail(request.getEmail());
 
         return fatturaRepository.save(fattura);
     }
 
-    // 🔹 **Aggiorna una fattura**
     @Transactional
     public Fattura updateFattura(Long id, FatturaRequest request) {
         Fattura fattura = getFatturaById(id);
@@ -56,10 +60,15 @@ public class FatturaService {
         fattura.setDataEmissione(request.getDataEmissione());
         fattura.setImporto(request.getImporto());
         fattura.setDescrizione(request.getDescrizione());
+        fattura.setNome(request.getNome());
+        fattura.setCognome(request.getCognome());
+        fattura.setCodiceFiscale(request.getCodiceFiscale());
+        fattura.setIndirizzo(request.getIndirizzo());
+        fattura.setTelefono(request.getTelefono());
+        fattura.setEmail(request.getEmail());
 
         return fatturaRepository.save(fattura);
     }
-
     // 🔹 **Elimina una fattura**
     @Transactional
     public void deleteFattura(Long id) {

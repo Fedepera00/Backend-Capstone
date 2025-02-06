@@ -31,7 +31,15 @@ public class PdfService {
                 contentStream.newLineAtOffset(50, 700);
                 contentStream.showText("Numero: " + fattura.getNumero());
                 contentStream.newLineAtOffset(0, -20);
-                contentStream.showText("Data Emissione: " + fattura.getDataEmissione());
+                contentStream.showText("Nome: " + fattura.getNome() + " " + fattura.getCognome());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Codice Fiscale: " + fattura.getCodiceFiscale());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Indirizzo: " + fattura.getIndirizzo());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Telefono: " + fattura.getTelefono());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("Email: " + fattura.getEmail());
                 contentStream.newLineAtOffset(0, -20);
                 contentStream.showText("Importo: €" + fattura.getImporto());
                 contentStream.newLineAtOffset(0, -20);

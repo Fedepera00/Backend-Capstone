@@ -23,4 +23,23 @@ public class Fattura {
 
     @Column(nullable = false)
     private String descrizione;
+
+    // Nuovi campi aggiunti
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false)
+    private String cognome;
+
+    @Column(nullable = false)
+    private String codiceFiscale;
+
+    @Column(nullable = false)
+    private String indirizzo;
+
+    @Column(nullable = true)
+    private String telefono;
+
+    @Column(nullable = true)
+    private String email;
 }

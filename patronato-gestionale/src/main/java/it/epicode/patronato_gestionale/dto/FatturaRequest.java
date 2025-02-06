@@ -19,4 +19,20 @@ public class FatturaRequest {
 
     @NotBlank(message = "La descrizione è obbligatoria")
     private String descrizione;
+
+    @NotBlank(message = "Il nome è obbligatorio")
+    private String nome;
+
+    @NotBlank(message = "Il cognome è obbligatorio")
+    private String cognome;
+
+    @NotBlank(message = "Il codice fiscale è obbligatorio")
+    private String codiceFiscale;
+
+    @NotBlank(message = "L'indirizzo è obbligatorio")
+    private String indirizzo;
+
+    private String telefono;
+
+    private String email;
 }
