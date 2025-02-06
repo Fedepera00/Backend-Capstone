@@ -6,6 +6,7 @@ import it.epicode.patronato_gestionale.services.FatturaService;
 import it.epicode.patronato_gestionale.services.PdfService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,13 @@ public class FatturaController {
         return ResponseEntity.ok(fatturaService.getFatturaById(id));
     }
 
+    @GetMapping("/paginate")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
+    public ResponseEntity<Page<Fattura>> getFatturePaginate(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(fatturaService.getFatturePaginate(page, size));
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")

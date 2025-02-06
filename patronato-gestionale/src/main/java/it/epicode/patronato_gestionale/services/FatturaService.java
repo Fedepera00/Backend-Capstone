@@ -9,12 +9,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class FatturaService {
 
     @Autowired
     private FatturaRepository fatturaRepository;
+
+    // Metodo per ottenere le fatture paginando
+    public Page<Fattura> getFatturePaginate(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return fatturaRepository.findAll(pageable);
+    }
 
     // 🔹 **Ottieni tutte le fatture**
     public List<Fattura> getAllFatture() {
