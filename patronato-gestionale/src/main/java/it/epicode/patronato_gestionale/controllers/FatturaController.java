@@ -1,6 +1,7 @@
 package it.epicode.patronato_gestionale.controllers;
 
 import it.epicode.patronato_gestionale.dto.FatturaRequest;
+import it.epicode.patronato_gestionale.dto.PageDTO;
 import it.epicode.patronato_gestionale.entities.Fattura;
 import it.epicode.patronato_gestionale.services.FatturaService;
 import it.epicode.patronato_gestionale.services.PdfService;
@@ -44,12 +45,23 @@ public class FatturaController {
 
     @GetMapping("/paginate")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
-    public ResponseEntity<Page<Fattura>> getFatturePaginate(
+    public ResponseEntity<PageDTO<Fattura>> getFatturePaginate(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(fatturaService.getFatturePaginate(page, size));
-    }
 
+        Page<Fattura> fatturePage = fatturaService.getFatturePaginate(page, size);
+
+        PageDTO<Fattura> pageDTO = new PageDTO<>(
+                fatturePage.getContent(),
+                fatturePage.getNumber(),
+                fatturePage.getSize(),
+                fatturePage.getTotalElements(),
+                fatturePage.getTotalPages(),
+                fatturePage.isLast()
+        );
+
+        return ResponseEntity.ok(pageDTO);
+    }
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Fattura> createFattura(@Valid @RequestBody FatturaRequest request) {
