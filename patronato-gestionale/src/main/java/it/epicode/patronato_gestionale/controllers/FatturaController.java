@@ -24,35 +24,38 @@ public class FatturaController {
     @Autowired
     private PdfService pdfService;
 
-    // ✅ GET ALL - Ottieni tutte le fatture**
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<List<Fattura>> getAllFatture() {
-        return ResponseEntity.ok(fatturaService.getAllFatture());
+        List<Fattura> fatture = fatturaService.getAllFatture();
+
+        // Log per verificare i dati inviati
+        fatture.forEach(fattura -> System.out.println("Fattura trovata: " + fattura));
+
+        return ResponseEntity.ok(fatture);
     }
 
-    // ✅ GET BY ID - Ottieni una singola fattura**
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Fattura> getFatturaById(@PathVariable Long id) {
         return ResponseEntity.ok(fatturaService.getFatturaById(id));
     }
 
-    // ✅ CREATE - Crea una nuova fattura**
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Fattura> createFattura(@Valid @RequestBody FatturaRequest request) {
+        System.out.println("Payload ricevuto: " + request);
         return ResponseEntity.ok(fatturaService.createFattura(request));
     }
 
-    // ✅ UPDATE - Modifica una fattura esistente**
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Fattura> updateFattura(@PathVariable Long id, @Valid @RequestBody FatturaRequest request) {
         return ResponseEntity.ok(fatturaService.updateFattura(id, request));
     }
 
-    // ✅ DELETE - Elimina una fattura**
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Void> deleteFattura(@PathVariable Long id) {
@@ -60,7 +63,7 @@ public class FatturaController {
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ PDF DOWNLOAD - Scarica la fattura in PDF**
+
     @GetMapping("/{id}/pdf")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<byte[]> downloadFatturaPdf(@PathVariable Long id) {

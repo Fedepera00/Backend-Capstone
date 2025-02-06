@@ -20,6 +20,7 @@ public class FatturaRequest {
     @NotBlank(message = "La descrizione è obbligatoria")
     private String descrizione;
 
+    // Campi aggiuntivi
     @NotBlank(message = "Il nome è obbligatorio")
     private String nome;
 
@@ -33,6 +34,5 @@ public class FatturaRequest {
     private String indirizzo;
 
     private String telefono;
-
     private String email;
 }

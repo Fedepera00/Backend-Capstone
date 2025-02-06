@@ -35,7 +35,7 @@ public class FatturaService {
 
         Fattura fattura = new Fattura();
         fattura.setNumero(request.getNumero());
-        fattura.setDataEmissione(request.getDataEmissione() != null ? request.getDataEmissione() : LocalDate.now());
+        fattura.setDataEmissione(request.getDataEmissione());
         fattura.setImporto(request.getImporto());
         fattura.setDescrizione(request.getDescrizione());
         fattura.setNome(request.getNome());
@@ -44,6 +44,8 @@ public class FatturaService {
         fattura.setIndirizzo(request.getIndirizzo());
         fattura.setTelefono(request.getTelefono());
         fattura.setEmail(request.getEmail());
+
+        System.out.println("Fattura salvata: " + fattura); // Log per debug
 
         return fatturaRepository.save(fattura);
     }
