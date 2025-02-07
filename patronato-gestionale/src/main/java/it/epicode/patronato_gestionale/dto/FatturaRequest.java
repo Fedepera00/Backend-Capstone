@@ -1,8 +1,10 @@
 package it.epicode.patronato_gestionale.dto;
 
+import it.epicode.patronato_gestionale.enums.FatturaStato;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 import java.time.LocalDate;
 
 @Data
@@ -20,7 +22,6 @@ public class FatturaRequest {
     @NotBlank(message = "La descrizione è obbligatoria")
     private String descrizione;
 
-    // Campi aggiuntivi
     @NotBlank(message = "Il nome è obbligatorio")
     private String nome;
 
@@ -35,4 +36,7 @@ public class FatturaRequest {
 
     private String telefono;
     private String email;
+
+    @NotNull(message = "Lo stato della fattura è obbligatorio")
+    private FatturaStato stato; // Stato della fattura
 }

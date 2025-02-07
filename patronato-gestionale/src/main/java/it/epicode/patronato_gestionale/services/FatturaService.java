@@ -2,13 +2,17 @@ package it.epicode.patronato_gestionale.services;
 
 import it.epicode.patronato_gestionale.dto.FatturaRequest;
 import it.epicode.patronato_gestionale.entities.Fattura;
+import it.epicode.patronato_gestionale.enums.FatturaStato;
 import it.epicode.patronato_gestionale.repositories.FatturaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
+
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,18 +23,15 @@ public class FatturaService {
     @Autowired
     private FatturaRepository fatturaRepository;
 
-    // Metodo per ottenere le fatture paginando
     public Page<Fattura> getFatturePaginate(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return fatturaRepository.findAll(pageable);
     }
 
-    // 🔹 **Ottieni tutte le fatture**
     public List<Fattura> getAllFatture() {
         return fatturaRepository.findAll();
     }
 
-    // 🔹 **Ottieni una fattura per ID**
     public Fattura getFatturaById(Long id) {
         return fatturaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Fattura non trovata con ID: " + id));
@@ -53,8 +54,7 @@ public class FatturaService {
         fattura.setIndirizzo(request.getIndirizzo());
         fattura.setTelefono(request.getTelefono());
         fattura.setEmail(request.getEmail());
-
-        System.out.println("Fattura salvata: " + fattura); // Log per debug
+        fattura.setStato(request.getStato());
 
         return fatturaRepository.save(fattura);
     }
@@ -77,15 +77,21 @@ public class FatturaService {
         fattura.setIndirizzo(request.getIndirizzo());
         fattura.setTelefono(request.getTelefono());
         fattura.setEmail(request.getEmail());
+        fattura.setStato(request.getStato());
 
         return fatturaRepository.save(fattura);
     }
-    // 🔹 **Elimina una fattura**
+
     @Transactional
     public void deleteFattura(Long id) {
         if (!fatturaRepository.existsById(id)) {
             throw new EntityNotFoundException("Fattura non trovata con ID: " + id);
         }
         fatturaRepository.deleteById(id);
+    }
+
+    public Map<FatturaStato, Long> getFatturePerStato() {
+        return fatturaRepository.findAll().stream()
+                .collect(Collectors.groupingBy(Fattura::getStato, Collectors.counting()));
     }
 }

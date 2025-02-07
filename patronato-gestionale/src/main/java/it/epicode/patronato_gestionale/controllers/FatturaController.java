@@ -3,6 +3,7 @@ package it.epicode.patronato_gestionale.controllers;
 import it.epicode.patronato_gestionale.dto.FatturaRequest;
 import it.epicode.patronato_gestionale.dto.PageDTO;
 import it.epicode.patronato_gestionale.entities.Fattura;
+import it.epicode.patronato_gestionale.enums.FatturaStato;
 import it.epicode.patronato_gestionale.services.FatturaService;
 import it.epicode.patronato_gestionale.services.PdfService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/fatture")
@@ -29,12 +31,7 @@ public class FatturaController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<List<Fattura>> getAllFatture() {
-        List<Fattura> fatture = fatturaService.getAllFatture();
-
-        // Log per verificare i dati inviati
-        fatture.forEach(fattura -> System.out.println("Fattura trovata: " + fattura));
-
-        return ResponseEntity.ok(fatture);
+        return ResponseEntity.ok(fatturaService.getAllFatture());
     }
 
     @GetMapping("/{id}")
@@ -62,10 +59,10 @@ public class FatturaController {
 
         return ResponseEntity.ok(pageDTO);
     }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Fattura> createFattura(@Valid @RequestBody FatturaRequest request) {
-        System.out.println("Payload ricevuto: " + request);
         return ResponseEntity.ok(fatturaService.createFattura(request));
     }
 
@@ -75,7 +72,6 @@ public class FatturaController {
         return ResponseEntity.ok(fatturaService.updateFattura(id, request));
     }
 
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<Void> deleteFattura(@PathVariable Long id) {
@@ -83,16 +79,10 @@ public class FatturaController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{id}/pdf")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
     public ResponseEntity<byte[]> downloadFatturaPdf(@PathVariable Long id) {
         Fattura fattura = fatturaService.getFatturaById(id);
-
-        if (fattura == null) {
-            throw new RuntimeException("Fattura non trovata con ID: " + id);
-        }
-
         byte[] pdfContent = pdfService.generateFatturaPdf(fattura);
 
         return ResponseEntity.ok()

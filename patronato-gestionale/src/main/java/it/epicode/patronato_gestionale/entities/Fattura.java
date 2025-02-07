@@ -1,5 +1,6 @@
 package it.epicode.patronato_gestionale.entities;
 
+import it.epicode.patronato_gestionale.enums.FatturaStato;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
@@ -42,4 +43,8 @@ public class Fattura {
 
     @Column(nullable = true)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private FatturaStato stato; // Stato della fattura (PAGATA, IN_ATTESA, SCADUTA)
 }

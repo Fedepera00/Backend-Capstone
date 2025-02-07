@@ -1,7 +1,9 @@
 package it.epicode.patronato_gestionale.controllers;
 
+import it.epicode.patronato_gestionale.enums.FatturaStato;
 import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.services.DashboardService;
+import it.epicode.patronato_gestionale.services.FatturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,10 @@ public class DashboardController {
     @Autowired
     private DashboardService dashboardService;
 
+    @Autowired
+    private FatturaService fatturaService;
+
+    // 🔹 Pratiche - Statistiche
     @GetMapping("/pratiche-stato")
     public ResponseEntity<Map<StatoPratica, Long>> getPraticheByStato() {
         return ResponseEntity.ok(dashboardService.getPraticheByStato());
@@ -35,5 +41,17 @@ public class DashboardController {
     @GetMapping("/appuntamenti-mese")
     public ResponseEntity<Long> getAppuntamentiQuestoMese() {
         return ResponseEntity.ok(dashboardService.getAppuntamentiQuestoMese());
+    }
+
+    // 🔹 Fatture - Statistiche
+    @GetMapping("/totale-fatture")
+    public ResponseEntity<Long> getTotaleFatture() {
+        long totaleFatture = fatturaService.getAllFatture().size();
+        return ResponseEntity.ok(totaleFatture);
+    }
+
+    @GetMapping("/fatture-stato")
+    public ResponseEntity<Map<FatturaStato, Long>> getFatturePerStato() {
+        return ResponseEntity.ok(fatturaService.getFatturePerStato());
     }
 }
