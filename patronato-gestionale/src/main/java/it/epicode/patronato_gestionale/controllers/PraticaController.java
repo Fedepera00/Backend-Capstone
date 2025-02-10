@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import it.epicode.patronato_gestionale.dto.FileUploadSchema;
+import it.epicode.patronato_gestionale.dto.PageDTO;
 import it.epicode.patronato_gestionale.dto.PraticaRequest;
 import it.epicode.patronato_gestionale.entities.Pratica;
 import it.epicode.patronato_gestionale.enums.StatoPratica;
@@ -34,7 +35,6 @@ public class PraticaController {
 
     @Autowired
     private PraticaService praticaService;
-
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
@@ -110,13 +110,25 @@ public class PraticaController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @GetMapping
-    public ResponseEntity<Page<Pratica>> getPratiche(
+    public ResponseEntity<PageDTO<Pratica>> getPratiche(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size) {
-        Page<Pratica> pratiche = praticaService.getPratichePaginate(page, size);
-        return ResponseEntity.ok(pratiche);
-    }
 
+        // Otteniamo la pagina delle pratiche
+        Page<Pratica> praticaPage = praticaService.getPratichePaginate(page, size);
+
+        // Convertiamo in un DTO
+        PageDTO<Pratica> pageDto = new PageDTO<>(
+                praticaPage.getContent(),
+                praticaPage.getNumber(),
+                praticaPage.getSize(),
+                praticaPage.getTotalElements(),
+                praticaPage.getTotalPages(),
+                praticaPage.isLast()
+        );
+
+        return ResponseEntity.ok(pageDto);
+    }
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @GetMapping("/search")
     public ResponseEntity<List<Pratica>> searchPratiche(
