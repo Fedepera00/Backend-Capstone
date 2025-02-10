@@ -6,6 +6,7 @@ import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.services.PraticaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class PraticaController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Pratica>> getAllPratiche() {
         List<Pratica> pratiche = praticaService.getAllPratiche();
         return ResponseEntity.ok(pratiche);
@@ -50,6 +51,14 @@ public class PraticaController {
     public ResponseEntity<Pratica> getPraticaById(@PathVariable Long id) {
         Pratica pratica = praticaService.getPraticaById(id);
         return ResponseEntity.ok(pratica);
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
+    @GetMapping
+    public ResponseEntity<Page<Pratica>> getPratiche(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size) {
+        Page<Pratica> pratiche = praticaService.getPratichePaginate(page, size);
+        return ResponseEntity.ok(pratiche);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

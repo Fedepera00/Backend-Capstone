@@ -5,6 +5,9 @@ import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.repositories.PraticaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,6 +20,10 @@ public class PraticaService {
     @Autowired
     private PraticaRepository praticaRepository;
 
+    public Page<Pratica> getPratichePaginate(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return praticaRepository.findAll(pageable);
+    }
     public Pratica createPratica(String titolo, String descrizione, String richiedente, String codiceFiscale, String categoria, String note, StatoPratica stato) {
         Pratica pratica = new Pratica();
         pratica.setTitolo(titolo);
