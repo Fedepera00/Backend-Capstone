@@ -12,21 +12,13 @@ import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.services.PraticaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -56,32 +48,11 @@ public class PraticaController {
         }
     }
 
-    @GetMapping("/uploads/pdf/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
-        Path filePath = Paths.get("uploads/pdf").resolve(fileName).normalize();
-        System.out.println("Tentativo di accedere al file: " + filePath);
-
-        try {
-            Resource resource = new UrlResource(filePath.toUri());
-            if (!resource.exists() || !resource.isReadable()) {
-                System.out.println("Errore: File non trovato o non leggibile: " + filePath);
-                throw new FileNotFoundException("File non trovato o non leggibile: " + fileName);
-            }
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
-        } catch (Exception e) {
-            System.out.println("Errore durante il download del file: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
     @PostMapping("/{id}/upload-pdf")
     @Operation(
-            summary = "Carica un file PDF associato a una pratica",
-            description = "Endpoint per caricare un file PDF associato a una pratica esistente",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            summary = "Carica un file PDF su Google Drive",
+            description = "Endpoint per caricare un file PDF associato a una pratica esistente su Google Drive",
+            requestBody = @RequestBody(
                     required = true,
                     content = @Content(
                             mediaType = "multipart/form-data",
@@ -91,21 +62,21 @@ public class PraticaController {
     )
     public ResponseEntity<String> uploadPdf(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
-            String relativePath = praticaService.uploadPdf(id, file);
-            String fileUrl = "/uploads/pdf/" + relativePath;
-            return ResponseEntity.ok(fileUrl);
+            String fileLink = praticaService.uploadPdf(id, file);
+            return ResponseEntity.ok("File caricato con successo! Link: " + fileLink);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante il caricamento del file: " + e.getMessage());
         }
     }
 
     @GetMapping("/{id}/download-pdf")
-    @Operation(summary = "Scarica il PDF associato a una pratica")
-    public ResponseEntity<Resource> downloadPdf(@PathVariable Long id) {
+    @Operation(summary = "Ottiene il link per scaricare il PDF associato a una pratica su Google Drive")
+    public ResponseEntity<String> getPdfLink(@PathVariable Long id) {
         try {
-            return praticaService.downloadPdf(id);
+            String fileLink = praticaService.getPdfLink(id);
+            return ResponseEntity.ok(fileLink);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Errore nel recupero del file: " + e.getMessage());
         }
     }
 

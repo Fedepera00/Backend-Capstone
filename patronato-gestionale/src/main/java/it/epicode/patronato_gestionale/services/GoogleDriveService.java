@@ -1,9 +1,8 @@
 package it.epicode.patronato_gestionale.services;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.InputStreamContent;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -16,7 +15,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
@@ -34,7 +34,6 @@ public class GoogleDriveService {
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(inputStream)
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/drive"));
 
-        // Converti le credenziali in un HttpRequestInitializer
         HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
 
         // Inizializza il servizio Google Drive
@@ -53,12 +52,10 @@ public class GoogleDriveService {
         fileMetadata.setName(file.getOriginalFilename());
         fileMetadata.setParents(Collections.singletonList(folderId));
 
-        java.io.File tempFile = java.io.File.createTempFile("upload-", file.getOriginalFilename());
-        file.transferTo(tempFile);
+        FileContent mediaContent = new FileContent(file.getContentType(), file.getResource().getFile());
 
-        FileContent mediaContent = new FileContent("application/pdf", tempFile);
         File uploadedFile = driveService.files().create(fileMetadata, mediaContent)
-                .setFields("id, webViewLink")
+                .setFields("id")
                 .execute();
 
         // Imposta il file come visibile pubblicamente
@@ -67,23 +64,7 @@ public class GoogleDriveService {
                 .setRole("reader");
         driveService.permissions().create(uploadedFile.getId(), permission).execute();
 
-        String fileLink = uploadedFile.getWebViewLink();
-        System.out.println("✅ File caricato con successo! Link: " + fileLink);
-
-        return fileLink; // Ora restituisce il link pubblico
-    }
-
-    /**
-     * Scarica un file da Google Drive
-     */
-    public void downloadFile(String fileId, String outputPath) throws IOException {
-        java.io.File outputFile = new java.io.File(outputPath);
-        outputFile.getParentFile().mkdirs(); // Crea la directory se non esiste
-
-        try (OutputStream outputStream = new FileOutputStream(outputFile)) {
-            driveService.files().get(fileId).executeMediaAndDownloadTo(outputStream);
-        }
-
-        System.out.println("✅ File scaricato con successo: " + outputPath);
+        // Restituisce il link al file su Google Drive
+        return "https://drive.google.com/file/d/" + uploadedFile.getId() + "/view?usp=sharing";
     }
 }

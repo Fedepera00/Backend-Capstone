@@ -15,13 +15,13 @@ public class GoogleDriveController {
     @Autowired
     private GoogleDriveService googleDriveService;
 
-    @PostMapping(value = "/upload", consumes = "multipart/form-data") // 👈 Aggiunto consumes
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            String fileId = googleDriveService.uploadFile(file);
-            return ResponseEntity.ok("✅ File caricato con successo! ID: " + fileId);
+            String fileUrl = googleDriveService.uploadFile(file);
+            return ResponseEntity.ok("✅ File caricato con successo! Link: " + fileUrl);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("❌ Errore nel caricamento del file: " + e.getMessage());
         }
     }
-}
+    }

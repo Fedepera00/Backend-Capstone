@@ -14,10 +14,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.persistence.criteria.Predicate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -81,6 +80,15 @@ public class PraticaService {
         praticaRepository.deleteById(id);
     }
 
+    public String getPdfLink(Long id) {
+        Pratica pratica = getPraticaById(id);
+
+        if (pratica.getDriveUrl() == null) {
+            throw new IllegalArgumentException("Nessun file PDF associato a questa pratica");
+        }
+
+        return pratica.getDriveUrl();
+    }
     public List<Pratica> searchPratiche(String title, String requester, String status, LocalDate date) {
         return praticaRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -101,35 +109,28 @@ public class PraticaService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
     }
+
     public String uploadPdf(Long id, MultipartFile file) throws Exception {
         Pratica pratica = getPraticaById(id);
 
         if (file.isEmpty() || !file.getContentType().equals("application/pdf")) {
-            System.out.println("Errore: Il file deve essere un PDF valido.");
             throw new IllegalArgumentException("Il file deve essere un PDF valido");
         }
 
-        // Percorso della directory
         String directory = "uploads/pdf/";
         Path path = Paths.get(directory);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
-            System.out.println("Creata la directory: " + path);
         }
 
-        // Nome del file
         String fileName = id + "_" + file.getOriginalFilename();
         Path filePath = path.resolve(fileName);
 
-        // Salvataggio del file
         Files.copy(file.getInputStream(), filePath);
-        System.out.println("File salvato nel percorso: " + filePath);
 
-        // Salva solo il percorso relativo nella pratica
         String relativePath = directory + fileName;
-        pratica.setPdfUrl(relativePath);
+        pratica.setDriveUrl(relativePath);
         praticaRepository.save(pratica);
-        System.out.println("PDF associato alla pratica con ID: " + id);
 
         return relativePath;
     }
@@ -137,21 +138,14 @@ public class PraticaService {
     public ResponseEntity<Resource> downloadPdf(Long id) throws Exception {
         Pratica pratica = getPraticaById(id);
 
-        // Verifica se il PDF è associato
-        if (pratica.getPdfUrl() == null) {
-            System.out.println("Errore: Nessun file PDF associato alla pratica con ID: " + id);
+        if (pratica.getDriveUrl() == null) {
             throw new IllegalArgumentException("Nessun file PDF associato a questa pratica");
         }
 
-        // Usa il percorso corretto senza concatenazioni duplicate
-        Path filePath = Paths.get(pratica.getPdfUrl());
-        System.out.println("Tentativo di scaricare il file: " + filePath);
-
+        Path filePath = Paths.get(pratica.getDriveUrl());
         Resource resource = new UrlResource(filePath.toUri());
 
-        // Verifica l'esistenza e la leggibilità del file
         if (!resource.exists() || !resource.isReadable()) {
-            System.out.println("Errore: File non trovato o non leggibile: " + filePath);
             throw new IllegalArgumentException("File non trovato o non leggibile");
         }
 

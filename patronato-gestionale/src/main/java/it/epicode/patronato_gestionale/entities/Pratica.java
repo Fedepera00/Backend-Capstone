@@ -3,7 +3,6 @@ package it.epicode.patronato_gestionale.entities;
 import it.epicode.patronato_gestionale.enums.StatoPratica;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -32,7 +31,8 @@ public class Pratica {
 
     private String note;
 
-    private String pdfUrl; // Percorso al file PDF
+    @Column(nullable = true)
+    private String driveUrl; // ✅ Link al file su Google Drive
 
     @Column(nullable = false)
     private LocalDate dataCreazione;
@@ -43,4 +43,13 @@ public class Pratica {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatoPratica stato;
+
+    // ✅ Getter e Setter per driveUrl
+    public String getDriveUrl() {
+        return driveUrl;
+    }
+
+    public void setDriveUrl(String driveUrl) {
+        this.driveUrl = driveUrl;
+    }
 }
