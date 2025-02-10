@@ -102,51 +102,56 @@ public class PraticaService {
         });
     }
     public String uploadPdf(Long id, MultipartFile file) throws Exception {
-        // Stampa l'ID della pratica e il nome del file
-        System.out.println("Upload PDF: ID pratica = " + id);
-        System.out.println("Nome file ricevuto = " + (file != null ? file.getOriginalFilename() : "Nessun file ricevuto"));
-
         Pratica pratica = getPraticaById(id);
 
         if (file.isEmpty() || !file.getContentType().equals("application/pdf")) {
-            System.out.println("Errore: File vuoto o non è un PDF valido");
+            System.out.println("Errore: Il file deve essere un PDF valido.");
             throw new IllegalArgumentException("Il file deve essere un PDF valido");
         }
 
-        // Percorso del file
+        // Percorso della directory
         String directory = "uploads/pdf/";
         Path path = Paths.get(directory);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
-            System.out.println("Creata directory: " + directory);
+            System.out.println("Creata la directory: " + path);
         }
 
+        // Nome del file
         String fileName = id + "_" + file.getOriginalFilename();
         Path filePath = path.resolve(fileName);
 
         // Salvataggio del file
         Files.copy(file.getInputStream(), filePath);
-        System.out.println("File salvato in: " + filePath);
+        System.out.println("File salvato nel percorso: " + filePath);
 
-        // Aggiorna la pratica con il percorso del file
+        // Salva solo il percorso relativo nella pratica
         String relativePath = directory + fileName;
         pratica.setPdfUrl(relativePath);
         praticaRepository.save(pratica);
-        System.out.println("Pratica aggiornata con PDF URL: " + relativePath);
+        System.out.println("PDF associato alla pratica con ID: " + id);
 
-        return fileName;
+        return relativePath;
     }
+
     public ResponseEntity<Resource> downloadPdf(Long id) throws Exception {
         Pratica pratica = getPraticaById(id);
 
+        // Verifica se il PDF è associato
         if (pratica.getPdfUrl() == null) {
+            System.out.println("Errore: Nessun file PDF associato alla pratica con ID: " + id);
             throw new IllegalArgumentException("Nessun file PDF associato a questa pratica");
         }
 
-        Path filePath = Paths.get("uploads/pdf/", pratica.getPdfUrl());
+        // Usa il percorso corretto senza concatenazioni duplicate
+        Path filePath = Paths.get(pratica.getPdfUrl());
+        System.out.println("Tentativo di scaricare il file: " + filePath);
+
         Resource resource = new UrlResource(filePath.toUri());
 
+        // Verifica l'esistenza e la leggibilità del file
         if (!resource.exists() || !resource.isReadable()) {
+            System.out.println("Errore: File non trovato o non leggibile: " + filePath);
             throw new IllegalArgumentException("File non trovato o non leggibile");
         }
 
@@ -155,5 +160,4 @@ public class PraticaService {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName().toString() + "\"")
                 .body(resource);
     }
-
 }
