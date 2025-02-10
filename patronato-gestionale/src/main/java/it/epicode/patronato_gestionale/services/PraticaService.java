@@ -6,6 +6,7 @@ import it.epicode.patronato_gestionale.repositories.PraticaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -100,29 +101,41 @@ public class PraticaService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
     }
-    public void uploadPdf(Long id, MultipartFile file) throws Exception {
+    public String uploadPdf(Long id, MultipartFile file) throws Exception {
+        // Stampa l'ID della pratica e il nome del file
+        System.out.println("Upload PDF: ID pratica = " + id);
+        System.out.println("Nome file ricevuto = " + (file != null ? file.getOriginalFilename() : "Nessun file ricevuto"));
+
         Pratica pratica = getPraticaById(id);
 
         if (file.isEmpty() || !file.getContentType().equals("application/pdf")) {
+            System.out.println("Errore: File vuoto o non è un PDF valido");
             throw new IllegalArgumentException("Il file deve essere un PDF valido");
         }
 
-        // Salva il file in una directory locale
+        // Percorso del file
         String directory = "uploads/pdf/";
         Path path = Paths.get(directory);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
+            System.out.println("Creata directory: " + directory);
         }
 
-        String filePath = directory + file.getOriginalFilename();
-        Files.copy(file.getInputStream(), Paths.get(filePath));
+        String fileName = id + "_" + file.getOriginalFilename();
+        Path filePath = path.resolve(fileName);
 
-        // Associa il percorso del file alla pratica
-        pratica.setPdfUrl(filePath);
+        // Salvataggio del file
+        Files.copy(file.getInputStream(), filePath);
+        System.out.println("File salvato in: " + filePath);
+
+        // Aggiorna la pratica con il percorso del file
+        String relativePath = directory + fileName;
+        pratica.setPdfUrl(relativePath);
         praticaRepository.save(pratica);
-    }
+        System.out.println("Pratica aggiornata con PDF URL: " + relativePath);
 
-    // Metodo per il download dei PDF
+        return fileName;
+    }
     public ResponseEntity<Resource> downloadPdf(Long id) throws Exception {
         Pratica pratica = getPraticaById(id);
 
@@ -130,11 +143,11 @@ public class PraticaService {
             throw new IllegalArgumentException("Nessun file PDF associato a questa pratica");
         }
 
-        Path filePath = Paths.get(pratica.getPdfUrl());
-        org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+        Path filePath = Paths.get("uploads/pdf/", pratica.getPdfUrl());
+        Resource resource = new UrlResource(filePath.toUri());
 
-        if (!resource.exists()) {
-            throw new IllegalArgumentException("File non trovato");
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new IllegalArgumentException("File non trovato o non leggibile");
         }
 
         return ResponseEntity.ok()

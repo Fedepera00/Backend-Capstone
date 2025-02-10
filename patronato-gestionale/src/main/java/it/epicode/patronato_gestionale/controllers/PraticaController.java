@@ -10,6 +10,7 @@ import it.epicode.patronato_gestionale.entities.Pratica;
 import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.services.PraticaService;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
@@ -33,6 +34,7 @@ public class PraticaController {
 
     @Autowired
     private PraticaService praticaService;
+
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
@@ -68,14 +70,23 @@ public class PraticaController {
     )
     public ResponseEntity<String> uploadPdf(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
-            praticaService.uploadPdf(id, file);
-            return ResponseEntity.ok("File PDF caricato con successo!");
+            // Log del file ricevuto
+            System.out.println("File ricevuto: " + file.getOriginalFilename());
+            System.out.println("Tipo di contenuto: " + file.getContentType());
+
+            // Salva il file PDF
+            String relativePath = praticaService.uploadPdf(id, file);
+
+            // Restituisce l'URL completo al client
+            String fileUrl = "/uploads/pdf/" + relativePath;
+            return ResponseEntity.ok(fileUrl);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante il caricamento del file: " + e.getMessage());
         }
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
+
     @GetMapping("/{id}/download-pdf")
+    @Operation(summary = "Scarica il PDF associato a una pratica")
     public ResponseEntity<org.springframework.core.io.Resource> downloadPdf(@PathVariable Long id) {
         try {
             return praticaService.downloadPdf(id);
