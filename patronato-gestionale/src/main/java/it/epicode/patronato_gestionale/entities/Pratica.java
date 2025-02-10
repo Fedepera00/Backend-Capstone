@@ -32,6 +32,8 @@ public class Pratica {
 
     private String note;
 
+    private String pdfUrl; // Percorso al file PDF
+
     @Column(nullable = false)
     private LocalDate dataCreazione;
 

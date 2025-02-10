@@ -21,6 +21,10 @@ public class OpenApiConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .description("Inserisci il token JWT nel formato: Bearer {token}")
-                ));
+                ))
+                .info(new io.swagger.v3.oas.models.info.Info()
+                        .title("API Patronato Gestionale")
+                        .description("Gestione delle pratiche con upload PDF")
+                        .version("1.0.0"));
     }
 }
