@@ -4,6 +4,7 @@ import it.epicode.patronato_gestionale.enums.FatturaStato;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -47,4 +48,16 @@ public class Fattura {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FatturaStato stato; // Stato della fattura (PAGATA, IN_ATTESA, SCADUTA)
+
+    // Relazione con Dettaglio
+    @OneToMany(mappedBy = "fattura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Dettaglio> dettagli;
+
+    public List<Dettaglio> getDettagli() {
+        return dettagli;
+    }
+
+    public void setDettagli(List<Dettaglio> dettagli) {
+        this.dettagli = dettagli;
+    }
 }
