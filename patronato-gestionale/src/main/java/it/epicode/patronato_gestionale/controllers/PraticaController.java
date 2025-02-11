@@ -51,14 +51,18 @@ public class PraticaController {
     @PostMapping("/{id}/upload-pdf")
     @Operation(
             summary = "Carica un file PDF su Google Drive",
-            description = "Endpoint per caricare un file PDF associato a una pratica esistente su Google Drive"
+            description = "Endpoint per caricare un file PDF associato a una pratica esistente su Google Drive",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary"))
+            )
     )
     public ResponseEntity<String> uploadPdf(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file) {
         try {
             String fileLink = praticaService.uploadPdf(id, file);
-            return ResponseEntity.ok("File caricato con successo! Link: " + fileLink);
+            return ResponseEntity.ok(fileLink);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Errore durante il caricamento del file: " + e.getMessage());
         }
