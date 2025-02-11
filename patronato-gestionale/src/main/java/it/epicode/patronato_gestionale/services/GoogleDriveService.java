@@ -48,11 +48,19 @@ public class GoogleDriveService {
      * Carica un file su Google Drive
      */
     public String uploadFile(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Il file è vuoto!");
+        }
+
         File fileMetadata = new File();
         fileMetadata.setName(file.getOriginalFilename());
         fileMetadata.setParents(Collections.singletonList(folderId));
 
-        FileContent mediaContent = new FileContent(file.getContentType(), file.getResource().getFile());
+
+        java.io.File tempFile = java.io.File.createTempFile("upload_", ".pdf");
+        file.transferTo(tempFile);
+
+        FileContent mediaContent = new FileContent(file.getContentType(), tempFile);
 
         File uploadedFile = driveService.files().create(fileMetadata, mediaContent)
                 .setFields("id")

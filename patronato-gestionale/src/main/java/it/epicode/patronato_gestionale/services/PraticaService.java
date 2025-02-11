@@ -5,21 +5,13 @@ import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.repositories.PraticaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.criteria.Predicate;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,6 +23,12 @@ public class PraticaService {
     @Autowired
     private PraticaRepository praticaRepository;
 
+    @Autowired
+    private GoogleDriveService googleDriveService;
+
+    /**
+     * ✅ Metodo aggiunto per ottenere pratiche paginabili
+     */
     public Page<Pratica> getPratichePaginate(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return praticaRepository.findAll(pageable);
@@ -80,6 +78,41 @@ public class PraticaService {
         praticaRepository.deleteById(id);
     }
 
+    /**
+     * ✅ Carica il PDF su Google Drive e salva il link nella pratica
+     */
+    public String uploadPdf(Long id, MultipartFile file) throws Exception {
+        Pratica pratica = getPraticaById(id);
+
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Il file è vuoto!");
+        }
+
+        // Esempio di controllo basato sull'estensione del filename
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
+            throw new IllegalArgumentException("Il file deve essere un PDF valido");
+        }
+
+        // Oppure, se preferisci usare il content type, puoi usare:
+        // String contentType = file.getContentType();
+        // if (contentType == null || (!contentType.equals("application/pdf") && !contentType.equals("application/octet-stream"))) {
+        //     throw new IllegalArgumentException("Il file deve essere un PDF valido");
+        // }
+
+        // Carica il file su Google Drive e ottiene il link
+        String fileLink = googleDriveService.uploadFile(file);
+
+        // Salva il link su Google Drive nella pratica
+        pratica.setDriveUrl(fileLink);
+        praticaRepository.save(pratica);
+
+        return fileLink;
+    }
+
+    /**
+     * ✅ Recupera il link pubblico del PDF associato alla pratica
+     */
     public String getPdfLink(Long id) {
         Pratica pratica = getPraticaById(id);
 
@@ -89,6 +122,10 @@ public class PraticaService {
 
         return pratica.getDriveUrl();
     }
+
+    /**
+     * ✅ Cerca pratiche filtrando per titolo, richiedente, stato e data di creazione
+     */
     public List<Pratica> searchPratiche(String title, String requester, String status, LocalDate date) {
         return praticaRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -108,50 +145,5 @@ public class PraticaService {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
-    }
-
-    public String uploadPdf(Long id, MultipartFile file) throws Exception {
-        Pratica pratica = getPraticaById(id);
-
-        if (file.isEmpty() || !file.getContentType().equals("application/pdf")) {
-            throw new IllegalArgumentException("Il file deve essere un PDF valido");
-        }
-
-        String directory = "uploads/pdf/";
-        Path path = Paths.get(directory);
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
-        }
-
-        String fileName = id + "_" + file.getOriginalFilename();
-        Path filePath = path.resolve(fileName);
-
-        Files.copy(file.getInputStream(), filePath);
-
-        String relativePath = directory + fileName;
-        pratica.setDriveUrl(relativePath);
-        praticaRepository.save(pratica);
-
-        return relativePath;
-    }
-
-    public ResponseEntity<Resource> downloadPdf(Long id) throws Exception {
-        Pratica pratica = getPraticaById(id);
-
-        if (pratica.getDriveUrl() == null) {
-            throw new IllegalArgumentException("Nessun file PDF associato a questa pratica");
-        }
-
-        Path filePath = Paths.get(pratica.getDriveUrl());
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new IllegalArgumentException("File non trovato o non leggibile");
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName().toString() + "\"")
-                .body(resource);
     }
 }

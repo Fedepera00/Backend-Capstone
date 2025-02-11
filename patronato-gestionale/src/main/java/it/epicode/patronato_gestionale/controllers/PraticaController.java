@@ -51,11 +51,16 @@ public class PraticaController {
     @PostMapping("/{id}/upload-pdf")
     @Operation(
             summary = "Carica un file PDF su Google Drive",
-            description = "Endpoint per caricare un file PDF associato a una pratica esistente su Google Drive"
+            description = "Endpoint per caricare un file PDF associato a una pratica esistente su Google Drive",
+            requestBody = @RequestBody(
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(implementation = FileUploadSchema.class)
+                    )
+            )
     )
-    public ResponseEntity<String> uploadPdf(
-            @PathVariable Long id,
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadPdf(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             String fileLink = praticaService.uploadPdf(id, file);
             return ResponseEntity.ok("File caricato con successo! Link: " + fileLink);
