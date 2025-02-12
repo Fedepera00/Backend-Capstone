@@ -2,9 +2,12 @@ package it.epicode.patronato_gestionale.auth;
 
 import it.epicode.patronato_gestionale.dto.UpdateUserRequest;
 import it.epicode.patronato_gestionale.enums.Role;
+import it.epicode.patronato_gestionale.dto.AppUserDTO;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AppUserService {
@@ -63,14 +67,14 @@ public class AppUserService {
     }
 
     public AppUser loadUserByUsername(String username) {
-        System.out.println("Caricamento utente con username: " + username);
         return appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
     }
+
     public AppUser updateUserRole(Long id, Role nuovoRuolo) {
         AppUser appUser = appUserRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
-        appUser.getRoles().clear(); // Rimuovi i vecchi ruoli
+        appUser.getRoles().clear(); // Rimuove i vecchi ruoli
         appUser.getRoles().add(nuovoRuolo); // Assegna il nuovo ruolo
         return appUserRepository.save(appUser);
     }
@@ -81,6 +85,7 @@ public class AppUserService {
         }
         appUserRepository.deleteById(id);
     }
+
     public AppUser updateUserDetails(Long id, AppUser updatedUser) {
         AppUser existingUser = appUserRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
@@ -89,11 +94,14 @@ public class AppUserService {
         existingUser.setCognome(updatedUser.getCognome());
         existingUser.setEmail(updatedUser.getEmail());
         existingUser.setUsername(updatedUser.getUsername());
+
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
+
         return appUserRepository.save(existingUser);
     }
+
     public AppUser updateUserDetailsByUsername(String username, AppUser updatedUser) {
         AppUser appUser = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
@@ -102,7 +110,6 @@ public class AppUserService {
         appUser.setCognome(updatedUser.getCognome());
         appUser.setEmail(updatedUser.getEmail());
 
-        // Solo se la password è fornita, la aggiorniamo
         if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
             appUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
@@ -119,14 +126,31 @@ public class AppUserService {
             user.setCognome(updateUserRequest.getCognome());
             user.setEmail(updateUserRequest.getEmail());
 
-            // Se la password è stata modificata, aggiorniamola
             if (updateUserRequest.getPassword() != null && !updateUserRequest.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
             }
 
-            appUserRepository.save(user); // Salva le modifiche nel database
+            appUserRepository.save(user);
         } else {
             throw new RuntimeException("Utente non trovato");
         }
+    }
+
+    public Page<AppUser> getAllUsers(PageRequest pageRequest) {
+        return appUserRepository.findAll(pageRequest);
+    }
+
+    public Page<AppUserDTO> getAllUsersAsDTO(PageRequest pageRequest) {
+        Page<AppUser> utentiPage = appUserRepository.findAll(pageRequest);
+
+        Page<AppUserDTO> utentiDTOPage = utentiPage.map(utente -> new AppUserDTO(
+                utente.getId(),
+                utente.getNome(),
+                utente.getCognome(),
+                utente.getEmail(),
+                utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet()) // Converti Enum in String
+        ));
+
+        return utentiDTOPage;
     }
 }

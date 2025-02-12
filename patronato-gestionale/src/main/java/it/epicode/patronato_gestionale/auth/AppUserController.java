@@ -1,7 +1,11 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.dto.AppUserDTO;
+import it.epicode.patronato_gestionale.dto.PageDTO;
 import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,13 +27,7 @@ public class AppUserController {
     @Autowired
     private AppUserService appUserService;
 
-    // Endpoint per ottenere tutti gli utenti (accesso consentito ad Admin e Collaboratori)
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_COLLABORATOR')")
-    public ResponseEntity<List<AppUser>> getAllUsers() {
-        List<AppUser> users = appUserRepository.findAll();
-        return ResponseEntity.ok(users);
-    }
+
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AppUser> getLoggedUser(Authentication authentication) {
@@ -138,6 +137,33 @@ public class AppUserController {
             System.err.println("Errore durante l'aggiornamento del profilo: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+    @GetMapping
+    public ResponseEntity<PageDTO<AppUserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size) {  // 6 utenti per pagina
+        Page<AppUser> utentiPage = appUserService.getAllUsers(PageRequest.of(page, size));
+
+        List<AppUserDTO> utentiDTO = utentiPage.getContent().stream()
+                .map(utente -> new AppUserDTO(
+                        utente.getId(),
+                        utente.getNome(),
+                        utente.getCognome(),
+                        utente.getEmail(),
+                        utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet()) // Converte Enum in String
+                ))
+                .toList();
+
+        PageDTO<AppUserDTO> response = new PageDTO<>(
+                utentiDTO,
+                utentiPage.getNumber(),
+                utentiPage.getSize(),
+                utentiPage.getTotalElements(),
+                utentiPage.getTotalPages(),
+                utentiPage.isLast()
+        );
+
+        return ResponseEntity.ok(response);
     }
     // Endpoint per eliminare un utente (solo Admin)
     @DeleteMapping("/{id}")
