@@ -1,5 +1,6 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.dto.UpdateUserRequest;
 import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -107,5 +108,25 @@ public class AppUserService {
         }
 
         return appUserRepository.save(appUser);
+    }
+
+    public void updateUser(String username, UpdateUserRequest updateUserRequest) {
+        Optional<AppUser> userOptional = appUserRepository.findByUsername(username);
+
+        if (userOptional.isPresent()) {
+            AppUser user = userOptional.get();
+            user.setNome(updateUserRequest.getNome());
+            user.setCognome(updateUserRequest.getCognome());
+            user.setEmail(updateUserRequest.getEmail());
+
+            // Se la password è stata modificata, aggiorniamola
+            if (updateUserRequest.getPassword() != null && !updateUserRequest.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
+            }
+
+            appUserRepository.save(user); // Salva le modifiche nel database
+        } else {
+            throw new RuntimeException("Utente non trovato");
+        }
     }
 }

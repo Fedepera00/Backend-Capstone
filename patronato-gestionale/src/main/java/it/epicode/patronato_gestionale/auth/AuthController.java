@@ -1,12 +1,13 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.dto.UpdateUserRequest;
 import it.epicode.patronato_gestionale.enums.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,17 +25,17 @@ public class AuthController {
         appUserService.registerUser(
                 registerRequest.getUsername(),
                 registerRequest.getPassword(),
-                registerRequest.getEmail(),    // Passiamo l'email
-                registerRequest.getNome(),     // Passiamo il nome
-                registerRequest.getCognome(),  // Passiamo il cognome
-                Set.of(Role.ROLE_COLLABORATOR) // Ruolo predefinito
+                registerRequest.getEmail(),
+                registerRequest.getNome(),
+                registerRequest.getCognome(),
+                Set.of(Role.ROLE_COLLABORATOR)
         );
 
-        // Creiamo un oggetto JSON con un messaggio
         Map<String, String> response = new HashMap<>();
         response.put("message", "Registrazione avvenuta con successo");
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
         String token = appUserService.authenticateUser(
@@ -42,5 +43,29 @@ public class AuthController {
                 loginRequest.getPassword()
         );
         return ResponseEntity.ok(new AuthResponse(token));
+    }
+    @PutMapping("/update")
+    public ResponseEntity<String> updateProfile(
+            @RequestBody UpdateUserRequest updateUserRequest,
+            Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Utente non autenticato");
+        }
+
+        String username = authentication.getName(); // Ottieni il nome utente dall'Authentication
+
+        appUserService.updateUser(username, updateUserRequest);
+        return ResponseEntity.ok("Profilo aggiornato con successo");
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utente non autenticato");
+        }
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userDetails);
     }
 }
