@@ -7,6 +7,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +15,10 @@ import org.springframework.stereotype.Service;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class GoogleCalendarService {
@@ -32,17 +33,33 @@ public class GoogleCalendarService {
     private static final JacksonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
     private Calendar getCalendarService() throws GeneralSecurityException, IOException {
-        HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        System.out.println("📌 Percorso file JSON: " + credentialsPath); // Debug
+
+        InputStream inputStream = new FileInputStream(new File("src/main/resources/google-calendar-gestionale-patronato.json"));
+        if (inputStream == null) {
+            throw new FileNotFoundException("❌ Il file NON è stato trovato: " + credentialsPath);
+        }
 
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(new FileInputStream(credentialsPath))
+                .fromStream(inputStream)
                 .createScoped(Collections.singleton("https://www.googleapis.com/auth/calendar"));
 
-        return new Calendar.Builder(httpTransport, JSON_FACTORY, new HttpCredentialsAdapter(credentials))
+        return new Calendar.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                JacksonFactory.getDefaultInstance(),
+                new HttpCredentialsAdapter(credentials))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
     }
+    public List<Event> getEvents() throws GeneralSecurityException, IOException {
+        Calendar service = getCalendarService();
+        Events events = service.events().list(calendarId)
+                .setOrderBy("startTime")
+                .setSingleEvents(true)
+                .execute();
 
+        return events.getItems();
+    }
     /**
      * Crea un evento sul calendario.
      *
