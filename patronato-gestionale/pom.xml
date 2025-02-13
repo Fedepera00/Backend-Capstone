@@ -134,12 +134,7 @@
 			<version>1.21.0</version>
 		</dependency>
 
-		<!-- Google API Client -->
-		<dependency>
-			<groupId>com.google.api-client</groupId>
-			<artifactId>google-api-client</artifactId>
-			<version>1.33.2</version>  <!-- Versione compatibile -->
-		</dependency>
+
 
 		<!-- Google Drive API -->
 		<dependency>
@@ -147,6 +142,33 @@
 			<artifactId>google-api-services-drive</artifactId>
 			<version>v3-rev136-1.25.0</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<!-- Google API Client -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.33.2</version>
+		</dependency>
+
+		<!-- Google OAuth Client -->
+		<dependency>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.22.0</version>
+		</dependency>
+
+		<!-- Google Calendar API -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-calendar</artifactId>
+			<version>v3-rev20210429-1.31.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.http-client</groupId>
+			<artifactId>google-http-client-jackson2</artifactId>
+			<version>1.43.3</version>
 		</dependency>
 	</dependencies>
 
