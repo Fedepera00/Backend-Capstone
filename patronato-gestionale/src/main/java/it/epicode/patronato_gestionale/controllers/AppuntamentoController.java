@@ -81,13 +81,12 @@ public class AppuntamentoController {
     }
 
     // Riservato a ROLE_ADMIN
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Appuntamento> updateAppuntamento(
             @PathVariable Long id,
             @RequestBody AppuntamentoRequest appuntamentoRequest) {
         System.out.println("Richiesta di aggiornamento appuntamento con ID: " + id);
-
         Appuntamento appuntamento = appuntamentoService.updateAppuntamento(
                 id,
                 appuntamentoRequest.getTitolo(),
@@ -98,7 +97,6 @@ public class AppuntamentoController {
                 appuntamentoRequest.getStato(),
                 appuntamentoRequest.getEmail()
         );
-
         System.out.println("Appuntamento aggiornato: " + appuntamento);
         return ResponseEntity.ok(appuntamento);
     }

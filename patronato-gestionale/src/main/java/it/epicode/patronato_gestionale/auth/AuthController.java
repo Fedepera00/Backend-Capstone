@@ -46,18 +46,19 @@ public class AuthController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<String> updateProfile(
+    public ResponseEntity<AppUser> updateProfile(
             @RequestBody UpdateUserRequest updateUserRequest,
             Authentication authentication) {
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).body("Utente non autenticato");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        String username = authentication.getName(); // Ottieni il nome utente dall'Authentication
-
+        String username = authentication.getName();
         appUserService.updateUser(username, updateUserRequest);
-        return ResponseEntity.ok("Profilo aggiornato con successo");
+        AppUser updatedUser = appUserService.loadUserByUsername(username);
+
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/me")
