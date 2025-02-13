@@ -84,20 +84,19 @@ public class AppUserController {
     }
 
     // Endpoint per aggiornare il ruolo di un utente (solo Admin)
-// Endpoint per aggiornare il ruolo di un utente (solo Admin)
     @PutMapping("/{id}/ruolo")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AppUser> updateRole(
             @PathVariable Long id,
             @RequestBody Map<String, String> payload) {
         try {
-            // Verifica che il payload contenga il ruolo
             String nuovoRuolo = payload.get("ruolo");
-            if (nuovoRuolo == null || (!nuovoRuolo.equals("ROLE_ADMIN") && !nuovoRuolo.equals("ROLE_COLLABORATOR"))) {
+            if (nuovoRuolo == null || (!nuovoRuolo.equals("ROLE_ADMIN")
+                    && !nuovoRuolo.equals("ROLE_COLLABORATOR")
+                    && !nuovoRuolo.equals("ROLE_USER"))) {
                 throw new IllegalArgumentException("Ruolo non valido: " + nuovoRuolo);
             }
 
-            // Converti il ruolo in un valore dell'enum
             Role ruoloEnum = Role.valueOf(nuovoRuolo);
             AppUser utenteAggiornato = appUserService.updateUserRole(id, ruoloEnum);
             return ResponseEntity.ok(utenteAggiornato);

@@ -42,5 +42,16 @@ public class AuthRunner implements ApplicationRunner {
                     Set.of(Role.ROLE_COLLABORATOR) // Passa i ruoli corretti
             );
         }
+        // Aggiungiamo un utente di prova con ROLE_USER
+        if (appUserService.findByUsername("user").isEmpty()) {
+            appUserService.registerUser(
+                    "user",
+                    "userpwd",
+                    "user@example.com",
+                    "User",
+                    "Test",
+                    Set.of(Role.ROLE_USER)
+            );
+        }
     }
 }

@@ -22,8 +22,8 @@ public class AppuntamentoController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
+    // Consente l'accesso a ROLE_ADMIN, ROLE_COLLABORATOR e ROLE_USER
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR') or hasRole('ROLE_USER')")
     @PostMapping
     public ResponseEntity<Appuntamento> createAppuntamento(
             @RequestBody AppuntamentoRequest appuntamentoRequest,
@@ -31,6 +31,7 @@ public class AppuntamentoController {
         System.out.println("Richiesta di creazione appuntamento ricevuta.");
         System.out.println("Token ricevuto: " + token);
 
+        // Estrai il token (rimuovendo "Bearer ") e recupera lo username
         String username = jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ", ""));
         System.out.println("Username estratto dal token: " + username);
 
@@ -50,7 +51,8 @@ public class AppuntamentoController {
         return ResponseEntity.ok(appuntamento);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR')")
+    // Consente l'accesso a ROLE_ADMIN, ROLE_COLLABORATOR e ROLE_USER
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR') or hasRole('ROLE_USER')")
     @GetMapping
     public ResponseEntity<List<Appuntamento>> getAllAppuntamenti(
             @RequestParam(required = false) String nome,
@@ -64,19 +66,21 @@ public class AppuntamentoController {
         LocalDateTime startDateTime = null;
         LocalDateTime endDateTime = null;
 
-        // Converte le stringhe in LocalDateTime, se presenti
+        // Se presenti, converte le stringhe in LocalDateTime
         if (startDate != null && endDate != null) {
             startDateTime = LocalDateTime.parse(startDate);
             endDateTime = LocalDateTime.parse(endDate);
             System.out.println("Filtri aggiuntivi - Data inizio: " + startDateTime + ", Data fine: " + endDateTime);
         }
 
-        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(nome, cognome, stato, startDateTime, endDateTime);
+        List<Appuntamento> appuntamenti = appuntamentoService.filterAppuntamenti(
+                nome, cognome, stato, startDateTime, endDateTime);
         System.out.println("Numero di appuntamenti trovati: " + appuntamenti.size());
 
         return ResponseEntity.ok(appuntamenti);
     }
 
+    // Riservato a ROLE_ADMIN
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Appuntamento> updateAppuntamento(
@@ -99,6 +103,7 @@ public class AppuntamentoController {
         return ResponseEntity.ok(appuntamento);
     }
 
+    // Riservato a ROLE_ADMIN
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppuntamento(@PathVariable Long id) {

@@ -28,7 +28,7 @@ public class AuthController {
                 registerRequest.getEmail(),
                 registerRequest.getNome(),
                 registerRequest.getCognome(),
-                Set.of(Role.ROLE_COLLABORATOR)
+                Set.of(Role.ROLE_USER) // Assegna ROLE_USER di default
         );
 
         Map<String, String> response = new HashMap<>();
@@ -44,6 +44,7 @@ public class AuthController {
         );
         return ResponseEntity.ok(new AuthResponse(token));
     }
+
     @PutMapping("/update")
     public ResponseEntity<String> updateProfile(
             @RequestBody UpdateUserRequest updateUserRequest,
