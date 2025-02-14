@@ -4,13 +4,18 @@ import it.epicode.patronato_gestionale.dto.AppuntamentoRequest;
 import it.epicode.patronato_gestionale.entities.Appuntamento;
 import it.epicode.patronato_gestionale.services.AppuntamentoService;
 import it.epicode.patronato_gestionale.auth.JwtTokenUtil;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/appuntamenti")
@@ -25,30 +30,47 @@ public class AppuntamentoController {
     // Consente l'accesso a ROLE_ADMIN, ROLE_COLLABORATOR e ROLE_USER
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR') or hasRole('ROLE_USER')")
     @PostMapping
-    public ResponseEntity<Appuntamento> createAppuntamento(
+    public ResponseEntity<?> createAppuntamento(
             @RequestBody AppuntamentoRequest appuntamentoRequest,
             @RequestHeader("Authorization") String token) {
-        System.out.println("Richiesta di creazione appuntamento ricevuta.");
-        System.out.println("Token ricevuto: " + token);
+        try {
+            String username = jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ", ""));
+            Appuntamento appuntamento = appuntamentoService.createAppuntamento(
+                    appuntamentoRequest.getTitolo(),
+                    appuntamentoRequest.getDataOra(),
+                    appuntamentoRequest.getLuogo(),
+                    appuntamentoRequest.getDescrizione(),
+                    appuntamentoRequest.getNome(),
+                    appuntamentoRequest.getCognome(),
+                    appuntamentoRequest.getStato(),
+                    appuntamentoRequest.getEmail(),
+                    username
+            );
+            return ResponseEntity.ok(appuntamento);
+        } catch (IllegalStateException ex) {
+            // Ritorna un errore 409 Conflict se l'orario non è disponibile
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore durante la creazione dell'appuntamento.");
+        }
+    }
 
-        // Estrai il token (rimuovendo "Bearer ") e recupera lo username
-        String username = jwtTokenUtil.getUsernameFromToken(token.replace("Bearer ", ""));
-        System.out.println("Username estratto dal token: " + username);
-
-        Appuntamento appuntamento = appuntamentoService.createAppuntamento(
-                appuntamentoRequest.getTitolo(),
-                appuntamentoRequest.getDataOra(),
-                appuntamentoRequest.getLuogo(),
-                appuntamentoRequest.getDescrizione(),
-                appuntamentoRequest.getNome(),
-                appuntamentoRequest.getCognome(),
-                appuntamentoRequest.getStato(),
-                appuntamentoRequest.getEmail(),
-                username
-        );
-
-        System.out.println("Appuntamento creato con successo: " + appuntamento);
-        return ResponseEntity.ok(appuntamento);
+    /**
+     * Endpoint per ottenere gli orari disponibili per una data.
+     * La data va passata come parametro di query nel formato "yyyy-MM-dd".
+     */
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_COLLABORATOR') or hasRole('ROLE_USER')")
+    @GetMapping("/availableSlots")
+    public ResponseEntity<List<String>> getAvailableSlots(@RequestParam String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        List<LocalTime> availableSlots = appuntamentoService.getAvailableSlots(localDate);
+        // Formatto gli orari come stringhe (es. "09:00", "09:15", etc.)
+        List<String> formattedSlots = availableSlots.stream()
+                .map(time -> time.toString())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(formattedSlots);
     }
 
     // Consente l'accesso a ROLE_ADMIN, ROLE_COLLABORATOR e ROLE_USER
