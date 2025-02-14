@@ -19,6 +19,9 @@ target/
 *.iml
 *.ipr
 
+google-drive-service-account.json
+google-calendar-gestionale-patronato.json
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
