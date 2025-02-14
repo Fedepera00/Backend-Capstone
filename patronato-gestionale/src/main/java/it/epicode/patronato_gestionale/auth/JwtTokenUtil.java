@@ -25,6 +25,7 @@ public class JwtTokenUtil {
 
     // Estrae il nome utente dal token JWT
     public String getUsernameFromToken(String token) {
+        System.out.println("📌 [DEBUG] Token ricevuto in getUsernameFromToken: " + token);
         return getClaimFromToken(token, Claims::getSubject);
     }
 

@@ -11,7 +11,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -30,18 +31,19 @@ public class GoogleCalendarService {
     private String calendarId;
 
     /**
-     * Inizializza il servizio Google Calendar con le credenziali OAuth 2.0.
+     * Inizializza il servizio Google Calendar leggendo le credenziali dal classpath.
      *
-     * @return Il servizio Google Calendar autenticato.
-     * @throws GeneralSecurityException Se ci sono problemi di sicurezza.
-     * @throws IOException              Se il file delle credenziali non viene trovato.
+     * @return il servizio Google Calendar autenticato.
+     * @throws GeneralSecurityException
+     * @throws IOException
      */
     private Calendar getCalendarService() throws GeneralSecurityException, IOException {
-        System.out.println("📌 [DEBUG] Percorso file JSON: " + credentialsPath);
+        System.out.println("📌 [DEBUG] Caricamento file JSON delle credenziali dal classpath: " + credentialsPath);
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(credentialsPath);
+        // Carica il file delle credenziali dal classpath
+        InputStream inputStream = getClass().getResourceAsStream("/" + credentialsPath);
         if (inputStream == null) {
-            throw new FileNotFoundException("❌ Il file JSON delle credenziali NON è stato trovato: " + credentialsPath);
+            throw new IOException("❌ Il file JSON delle credenziali NON è stato trovato nel classpath: " + credentialsPath);
         }
 
         GoogleCredentials credentials = GoogleCredentials.fromStream(inputStream)
@@ -56,11 +58,11 @@ public class GoogleCalendarService {
     }
 
     /**
-     * Recupera la lista di eventi dal Google Calendar.
+     * Recupera la lista di eventi dal calendario.
      *
      * @return Lista di eventi.
-     * @throws GeneralSecurityException Se c'è un errore di autenticazione.
-     * @throws IOException              Se ci sono problemi di connessione.
+     * @throws GeneralSecurityException
+     * @throws IOException
      */
     public List<Event> getEvents() throws GeneralSecurityException, IOException {
         System.out.println("📌 [DEBUG] Recupero eventi dal calendario...");
@@ -76,46 +78,42 @@ public class GoogleCalendarService {
     }
 
     /**
-     * Crea un evento su Google Calendar.
+     * Crea un nuovo evento sul calendario.
      *
      * @param summary       Titolo dell'evento.
      * @param location      Luogo dell'evento.
      * @param description   Descrizione dell'evento.
-     * @param startDateTime Data/ora di inizio in formato ISO 8601 (es. "2025-02-14T09:00:00+01:00").
-     * @param endDateTime   Data/ora di fine in formato ISO 8601.
+     * @param startDateTime Data/ora di inizio (formato ISO 8601, es. "2025-02-14T09:00:00+01:00").
+     * @param endDateTime   Data/ora di fine (formato ISO 8601).
      * @return L'evento creato.
-     * @throws GeneralSecurityException Se c'è un errore di autenticazione.
-     * @throws IOException              Se ci sono problemi di connessione.
+     * @throws GeneralSecurityException
+     * @throws IOException
      */
     public Event createEvent(String summary, String location, String description,
                              String startDateTime, String endDateTime) throws GeneralSecurityException, IOException {
         System.out.println("📌 [DEBUG] Creazione evento: " + summary);
-
         Calendar service = getCalendarService();
 
         Event event = new Event()
                 .setSummary(summary)
                 .setLocation(location)
-                .setDescription(description);
+                .setDescription(description)
+                .setVisibility("public")
+                .setStatus("confirmed");
 
-        try {
-            EventDateTime start = new EventDateTime()
-                    .setDateTime(new com.google.api.client.util.DateTime(startDateTime))
-                    .setTimeZone("Europe/Rome");
-            event.setStart(start);
+        EventDateTime start = new EventDateTime()
+                .setDateTime(new com.google.api.client.util.DateTime(startDateTime))
+                .setTimeZone("Europe/Rome");
+        event.setStart(start);
 
-            EventDateTime end = new EventDateTime()
-                    .setDateTime(new com.google.api.client.util.DateTime(endDateTime))
-                    .setTimeZone("Europe/Rome");
-            event.setEnd(end);
+        EventDateTime end = new EventDateTime()
+                .setDateTime(new com.google.api.client.util.DateTime(endDateTime))
+                .setTimeZone("Europe/Rome");
+        event.setEnd(end);
 
-            event = service.events().insert(calendarId, event).execute();
+        event = service.events().insert(calendarId, event).execute();
 
-            System.out.println("✅ [SUCCESSO] Evento creato con successo: " + event.getHtmlLink());
-            return event;
-        } catch (Exception e) {
-            System.err.println("❌ [ERRORE] Creazione evento fallita: " + e.getMessage());
-            throw e;
-        }
+        System.out.println("✅ [SUCCESSO] Evento creato con successo: " + event.getHtmlLink());
+        return event;
     }
 }
