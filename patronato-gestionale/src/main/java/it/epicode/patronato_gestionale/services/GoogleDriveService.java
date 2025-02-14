@@ -2,7 +2,6 @@ package it.epicode.patronato_gestionale.services;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -11,26 +10,38 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import jakarta.annotation.PostConstruct; // Usa questo se hai la dipendenza Jakarta
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Service
 public class GoogleDriveService {
 
-    private final Drive driveService;
+    // Rimuovi "final" per poter assegnare il valore successivamente
+    private Drive driveService;
 
     @Value("${google.drive.folder.id}")
     private String folderId;
 
-    public GoogleDriveService() throws GeneralSecurityException, IOException {
-        // Carica le credenziali dal file JSON
-        InputStream inputStream = new ClassPathResource("google-drive-service-account.json").getInputStream();
+    @Value("${google.drive.credentials.json}")
+    private String driveCredentialsJson;
+
+    // Costruttore vuoto; l'inizializzazione avviene in init()
+    public GoogleDriveService() {
+    }
+
+    @PostConstruct
+    private void init() throws GeneralSecurityException, IOException {
+        // Converti il contenuto della variabile d'ambiente in InputStream
+        InputStream inputStream = new ByteArrayInputStream(
+                driveCredentialsJson.getBytes(StandardCharsets.UTF_8)
+        );
         GoogleCredentials credentials = ServiceAccountCredentials.fromStream(inputStream)
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/drive"));
 
@@ -44,9 +55,6 @@ public class GoogleDriveService {
         ).setApplicationName("Gestionale Patronato").build();
     }
 
-    /**
-     * Carica un file su Google Drive
-     */
     public String uploadFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("Il file è vuoto!");
@@ -56,11 +64,12 @@ public class GoogleDriveService {
         fileMetadata.setName(file.getOriginalFilename());
         fileMetadata.setParents(Collections.singletonList(folderId));
 
-
+        // Crea un file temporaneo per il caricamento
         java.io.File tempFile = java.io.File.createTempFile("upload_", ".pdf");
         file.transferTo(tempFile);
 
-        FileContent mediaContent = new FileContent(file.getContentType(), tempFile);
+        com.google.api.client.http.FileContent mediaContent =
+                new com.google.api.client.http.FileContent(file.getContentType(), tempFile);
 
         File uploadedFile = driveService.files().create(fileMetadata, mediaContent)
                 .setFields("id")
