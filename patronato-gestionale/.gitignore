@@ -19,8 +19,8 @@ target/
 *.iml
 *.ipr
 
-/patronato-gestionale/src/main/resources/google-drive-service-account.json
-/patronato-gestionale/src/main/resources/google-calendar-gestionale-patronato.json
+Backend/patronato-gestionale/src/main/resources/google-drive-service-account.json
+Backend/patronato-gestionale/src/main/resources/google-calendar-gestionale-patronato.json
 
 ### NetBeans ###
 /nbproject/private/
