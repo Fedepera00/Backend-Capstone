@@ -23,4 +23,8 @@ public class Note {
     // La data in cui è stata creata la nota (formato YYYY-MM-DD)
     @Column(nullable = false)
     private LocalDate date;
+
+    // Il nome utente proprietario della nota
+    @Column(nullable = false)
+    private String username;
 }
