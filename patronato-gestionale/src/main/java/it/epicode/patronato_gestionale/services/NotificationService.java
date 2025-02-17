@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -16,22 +18,27 @@ public class NotificationService {
     private AppuntamentoRepository appuntamentoRepository;
 
     @Autowired
-    private EmailService emailService;
+    private TwilioSmsService twilioSmsService;
 
-    @Scheduled(cron = "0 0 8 * * ?") // Esegui ogni giorno alle 8:00
-    public void sendDailyReminders() {
-        List<Appuntamento> tomorrowAppointments = appuntamentoRepository.findByDataOraBetween(
-                LocalDateTime.now().plusDays(1).withHour(0).withMinute(0),
-                LocalDateTime.now().plusDays(1).withHour(23).withMinute(59)
-        );
+    // Esegui ogni giorno alle 8:00 AM (usa cron secondo la tua timezone)
+    @Scheduled(cron = "0 * * * * *", zone = "Europe/Rome")
+    public void sendReminders() {
+        // Recupera gli appuntamenti per il giorno successivo
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        LocalDateTime start = tomorrow.atStartOfDay();
+        LocalDateTime end = tomorrow.atTime(LocalTime.MAX);
 
-        for (Appuntamento appointment : tomorrowAppointments) {
-            String subject = "Promemoria Appuntamento";
-            String body = String.format(
-                    "Ciao %s,\n\nTi ricordiamo il tuo appuntamento per il %s alle ore %s presso %s.\n\nGrazie!",
-                    appointment.getNome(), appointment.getDataOra().toLocalDate(), appointment.getDataOra().toLocalTime(), appointment.getLuogo()
-            );
-            emailService.sendEmail(appointment.getEmail(), subject, body);
+        List<Appuntamento> appuntamenti = appuntamentoRepository.findByDataOraBetween(start, end);
+
+        // Per ogni appuntamento, invia un SMS (assicurati che l'Appuntamento abbia un campo "telefono")
+        for (Appuntamento app : appuntamenti) {
+            // Costruisci il messaggio
+            String message = String.format("Promemoria: Il tuo appuntamento '%s' è previsto per domani alle %s presso %s.",
+                    app.getTitolo(),
+                    app.getDataOra().toLocalTime().toString(),
+                    app.getLuogo());
+            // Supponendo che il campo "telefono" contenga il numero nel formato internazionale (es: +391234567890)
+            twilioSmsService.sendSms(app.getTelefono(), message);
         }
     }
 }

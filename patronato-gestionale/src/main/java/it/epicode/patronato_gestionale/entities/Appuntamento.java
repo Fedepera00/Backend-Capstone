@@ -34,7 +34,10 @@ public class Appuntamento {
     private String stato;
 
     @Column(nullable = false)
-    private String email; // Aggiunto per inviare email di notifica
+    private String email;
+
+    @Column(nullable = false)
+    private String telefono; // Campo telefono aggiunto
 
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)
