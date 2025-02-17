@@ -21,7 +21,7 @@ public class NotificationService {
     private TwilioSmsService twilioSmsService;
 
     // Esegui ogni giorno alle 8:00 AM (usa cron secondo la tua timezone)
-    @Scheduled(cron = "0 * * * * *", zone = "Europe/Rome")
+    @Scheduled(cron = "0 0 8 * * *", zone = "Europe/Rome")
     public void sendReminders() {
         // Recupera gli appuntamenti per il giorno successivo
         LocalDate tomorrow = LocalDate.now().plusDays(1);
