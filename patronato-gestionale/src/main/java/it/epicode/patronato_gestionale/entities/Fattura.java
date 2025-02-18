@@ -15,7 +15,7 @@ public class Fattura {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String numero; // Numero univoco della fattura
+    private String numero;
 
     @Column(nullable = false)
     private LocalDate dataEmissione;
@@ -47,9 +47,9 @@ public class Fattura {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FatturaStato stato; // Stato della fattura (PAGATA, IN_ATTESA, SCADUTA)
+    private FatturaStato stato;
 
-    // Relazione con Dettaglio
+
     @OneToMany(mappedBy = "fattura", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dettaglio> dettagli;
 

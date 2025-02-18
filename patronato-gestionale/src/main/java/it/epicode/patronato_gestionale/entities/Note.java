@@ -25,11 +25,11 @@ public class Note {
     @Column(nullable = false)
     private LocalDate date;
 
-    // Timestamp della creazione della nota
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    // Il nome utente proprietario della nota
+
     @Column(nullable = false)
     private String username;
 }

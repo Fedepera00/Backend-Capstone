@@ -22,7 +22,7 @@ public class DashboardController {
     @Autowired
     private FatturaService fatturaService;
 
-    // 🔹 Pratiche - Statistiche
+    // Statistiche
     @GetMapping("/pratiche-stato")
     public ResponseEntity<Map<StatoPratica, Long>> getPraticheByStato() {
         return ResponseEntity.ok(dashboardService.getPraticheByStato());
@@ -43,7 +43,7 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getAppuntamentiQuestoMese());
     }
 
-    // 🔹 Fatture - Statistiche
+    //  Fatture - Statistiche
     @GetMapping("/totale-fatture")
     public ResponseEntity<Long> getTotaleFatture() {
         long totaleFatture = fatturaService.getAllFatture().size();

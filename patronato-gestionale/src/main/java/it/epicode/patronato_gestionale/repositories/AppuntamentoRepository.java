@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface AppuntamentoRepository extends JpaRepository<Appuntamento, Long> {
-    // Trova appuntamenti tra due date specifiche
+
     List<Appuntamento> findByDataOraBetween(LocalDateTime startDate, LocalDateTime endDate);
     List<Appuntamento> findByNomeIgnoreCaseContainingAndCognomeIgnoreCaseContainingAndStatoIgnoreCaseContaining(String nome, String cognome, String stato);
 

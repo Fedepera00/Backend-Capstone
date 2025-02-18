@@ -11,5 +11,5 @@ public class AppUserDTO {
     private String nome;
     private String cognome;
     private String email;
-    private Set<String> roles; // Assumendo che tu abbia un Set<String> per i ruoli
+    private Set<String> roles;
 }

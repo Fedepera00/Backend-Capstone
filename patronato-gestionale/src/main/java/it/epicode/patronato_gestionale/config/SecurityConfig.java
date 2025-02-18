@@ -39,17 +39,15 @@ public class SecurityConfig {
 
 
         http
-                .csrf(csrf -> csrf.disable()) // Disabilita CSRF
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Accesso libero a Swagger
-                        //.requestMatchers("/api/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
-        // Aggiungi il filtro JWT
+
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

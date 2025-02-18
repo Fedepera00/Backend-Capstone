@@ -38,5 +38,5 @@ public class FatturaRequest {
     private String email;
 
     @NotNull(message = "Lo stato della fattura è obbligatorio")
-    private FatturaStato stato; // Stato della fattura
+    private FatturaStato stato;
 }

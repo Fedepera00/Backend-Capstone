@@ -17,8 +17,7 @@ public class NoteController {
     @Autowired
     private NoteService noteService;
 
-    // GET /api/notes/search?date=2025-02-15
-    // Restituisce solo le note del giorno per l'utente autenticato
+
     @GetMapping("/search")
     public ResponseEntity<List<Note>> getNotesByDate(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -28,8 +27,7 @@ public class NoteController {
         return ResponseEntity.ok(notes);
     }
 
-    // POST /api/notes
-    // Quando si crea una nota, viene assegnato il proprietario (username) in base all'utente autenticato
+
     @PostMapping
     public ResponseEntity<Note> createNote(@RequestBody Note note, Principal principal) {
         note.setUsername(principal.getName());
@@ -37,7 +35,7 @@ public class NoteController {
         return ResponseEntity.status(201).body(created);
     }
 
-    // PUT /api/notes/{id}
+
     @PutMapping("/{id}")
     public ResponseEntity<Note> updateNote(@PathVariable Long id, @RequestBody Note note) {
         return noteService.updateNote(id, note)
@@ -45,7 +43,7 @@ public class NoteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/notes/{id}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable Long id) {
         if (noteService.deleteNote(id)) {

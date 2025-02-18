@@ -13,5 +13,5 @@ public class AppuntamentoRequest {
     private String cognome;
     private String stato;
     private String email;
-    private String telefono;  // Campo telefono
+    private String telefono;
 }

@@ -19,17 +19,11 @@ public class GoogleCalendarController {
         this.calendarService = calendarService;
     }
 
-    /**
-     * Endpoint per recuperare gli eventi dal calendario.
-     */
     @GetMapping("/listEvents")
     public List<Event> listEvents() throws GeneralSecurityException, IOException {
         return calendarService.getEvents();
     }
 
-    /**
-     * Endpoint per creare un nuovo evento.
-     */
     @PostMapping("/createEvent")
     public Event createEvent(@RequestBody GoogleCalendarEventRequest request) throws GeneralSecurityException, IOException {
         return calendarService.createEvent(

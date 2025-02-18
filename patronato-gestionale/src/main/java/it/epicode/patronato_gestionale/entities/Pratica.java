@@ -32,7 +32,7 @@ public class Pratica {
     private String note;
 
     @Column(nullable = true)
-    private String driveUrl; // ✅ Link al file su Google Drive
+    private String driveUrl;
 
     @Column(nullable = false)
     private LocalDate dataCreazione;
@@ -44,7 +44,6 @@ public class Pratica {
     @Column(nullable = false)
     private StatoPratica stato;
 
-    // ✅ Getter e Setter per driveUrl
     public String getDriveUrl() {
         return driveUrl;
     }

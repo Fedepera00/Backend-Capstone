@@ -37,7 +37,7 @@ public class Appuntamento {
     private String email;
 
     @Column(nullable = false)
-    private String telefono; // Campo telefono aggiunto
+    private String telefono;
 
     @ManyToOne
     @JoinColumn(name = "utente_id", nullable = false)

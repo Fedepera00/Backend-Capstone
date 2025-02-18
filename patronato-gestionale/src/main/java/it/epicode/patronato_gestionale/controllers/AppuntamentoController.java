@@ -44,7 +44,7 @@ public class AppuntamentoController {
                     appuntamentoRequest.getStato(),
                     appuntamentoRequest.getEmail(),
                     username,
-                    appuntamentoRequest.getTelefono()  // Passa il telefono
+                    appuntamentoRequest.getTelefono()
             );
             return ResponseEntity.ok(appuntamento);
         } catch (IllegalStateException ex) {
@@ -104,7 +104,7 @@ public class AppuntamentoController {
                 appuntamentoRequest.getCognome(),
                 appuntamentoRequest.getStato(),
                 appuntamentoRequest.getEmail(),
-                appuntamentoRequest.getTelefono()  // Passa il telefono
+                appuntamentoRequest.getTelefono()
         );
         return ResponseEntity.ok(appuntamento);
     }

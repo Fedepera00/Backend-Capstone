@@ -6,7 +6,6 @@ public class FileUploadSchema {
     @Schema(type = "string", format = "binary", description = "Il file PDF da caricare")
     private String file;
 
-    // Getter e Setter (se necessari, altrimenti puoi ometterli)
     public String getFile() {
         return file;
     }
