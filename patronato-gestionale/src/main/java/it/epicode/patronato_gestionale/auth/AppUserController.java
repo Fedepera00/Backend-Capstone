@@ -69,12 +69,9 @@ public class AppUserController {
             @PathVariable Long id,
             @RequestBody AppUser updatedUser) {
         try {
-            System.out.println("Aggiornamento utente ID: " + id); // Debug
-            System.out.println("Nuovi dettagli utente: " + updatedUser); // Debug
             AppUser utenteAggiornato = appUserService.updateUserDetails(id, updatedUser);
             return ResponseEntity.ok(utenteAggiornato);
         } catch (EntityNotFoundException e) {
-            System.err.println("Errore: Utente non trovato con ID " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
             System.err.println("Errore generico: " + e.getMessage());
@@ -83,7 +80,7 @@ public class AppUserController {
         }
     }
 
-    // Endpoint per aggiornare il ruolo di un utente (solo Admin)
+
     @PutMapping("/{id}/ruolo")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<AppUser> updateRole(
@@ -116,18 +113,15 @@ public class AppUserController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AppUser> updateLoggedUser(Authentication authentication, @RequestBody AppUser updatedUser) {
         try {
-            String username = authentication.getName(); // Ottiene lo username dal token
-            System.out.println("Username autenticato: " + username);
-            System.out.println("Dati ricevuti dal frontend: " + updatedUser);
+            String username = authentication.getName();
 
             AppUser existingUser = appUserService.loadUserByUsername(username);
 
-            // Aggiorna solo i campi consentiti
             existingUser.setNome(updatedUser.getNome());
             existingUser.setCognome(updatedUser.getCognome());
             existingUser.setEmail(updatedUser.getEmail());
 
-            // Salva l'utente aggiornato
+
             AppUser savedUser = appUserRepository.save(existingUser);
             System.out.println("Dati salvati nel database: " + savedUser);
 
@@ -140,7 +134,7 @@ public class AppUserController {
     @GetMapping
     public ResponseEntity<PageDTO<AppUserDTO>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size) {  // 6 utenti per pagina
+            @RequestParam(defaultValue = "6") int size) {
         Page<AppUser> utentiPage = appUserService.getAllUsers(PageRequest.of(page, size));
 
         List<AppUserDTO> utentiDTO = utentiPage.getContent().stream()
@@ -149,7 +143,7 @@ public class AppUserController {
                         utente.getNome(),
                         utente.getCognome(),
                         utente.getEmail(),
-                        utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet()) // Converte Enum in String
+                        utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet())
                 ))
                 .toList();
 
@@ -164,12 +158,12 @@ public class AppUserController {
 
         return ResponseEntity.ok(response);
     }
-    // Endpoint per eliminare un utente (solo Admin)
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
-            System.out.println("Eliminazione utente ID: " + id); // Debug
+            System.out.println("Eliminazione utente ID: " + id);
             appUserService.deleteUser(id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {

@@ -28,7 +28,7 @@ public class AuthController {
                 registerRequest.getEmail(),
                 registerRequest.getNome(),
                 registerRequest.getCognome(),
-                Set.of(Role.ROLE_USER) // Assegna ROLE_USER di default
+                Set.of(Role.ROLE_USER)
         );
 
         Map<String, String> response = new HashMap<>();

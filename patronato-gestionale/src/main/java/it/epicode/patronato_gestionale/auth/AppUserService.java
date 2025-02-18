@@ -45,7 +45,7 @@ public class AppUserService {
         appUser.setEmail(email);
         appUser.setNome(nome);
         appUser.setCognome(cognome);
-        appUser.setRoles(roles); // Assicurati che roles non sia null
+        appUser.setRoles(roles);
 
         return appUserRepository.save(appUser);
     }
@@ -74,8 +74,8 @@ public class AppUserService {
     public AppUser updateUserRole(Long id, Role nuovoRuolo) {
         AppUser appUser = appUserRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con ID: " + id));
-        appUser.getRoles().clear(); // Rimuove i vecchi ruoli
-        appUser.getRoles().add(nuovoRuolo); // Assegna il nuovo ruolo
+        appUser.getRoles().clear();
+        appUser.getRoles().add(nuovoRuolo);
         return appUserRepository.save(appUser);
     }
 
@@ -148,7 +148,7 @@ public class AppUserService {
                 utente.getNome(),
                 utente.getCognome(),
                 utente.getEmail(),
-                utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet()) // Converti Enum in String
+                utente.getRoles().stream().map(Enum::name).collect(Collectors.toSet())
         ));
 
         return utentiDTOPage;

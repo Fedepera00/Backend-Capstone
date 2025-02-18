@@ -28,7 +28,7 @@ public class AuthRunner implements ApplicationRunner {
                     "admin@example.com",
                     "Admin",
                     "Superuser",
-                    Set.of(Role.ROLE_ADMIN) // Passa i ruoli corretti
+                    Set.of(Role.ROLE_ADMIN)
             );
         }
 
@@ -39,7 +39,7 @@ public class AuthRunner implements ApplicationRunner {
                     "collaborator@example.com",
                     "Collaboratore",
                     "Aziendale",
-                    Set.of(Role.ROLE_COLLABORATOR) // Passa i ruoli corretti
+                    Set.of(Role.ROLE_COLLABORATOR)
             );
         }
         // Aggiungiamo un utente di prova con ROLE_USER
