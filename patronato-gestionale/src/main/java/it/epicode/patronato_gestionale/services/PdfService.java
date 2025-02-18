@@ -30,7 +30,7 @@ public class PdfService {
 
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
-            // Header: Titolo "Fattura"
+
             contentStream.beginText();
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 22);
             contentStream.newLineAtOffset(margin, yStart);
@@ -45,7 +45,7 @@ public class PdfService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String dataEmissioneStr = fattura.getDataEmissione().format(formatter);
 
-            // Dettagli della fattura
+
             float textY = lineY - 30;
             contentStream.beginText();
             contentStream.setFont(PDType1Font.HELVETICA, 12);
@@ -68,11 +68,11 @@ public class PdfService {
             }
             contentStream.endText();
 
-            // Tabella Dettagli
+
             float tableY = textY - 40;
             tableY = drawTable(contentStream, tableY, margin, width, fattura.getDettagli());
 
-            // Footer
+
             drawFooter(contentStream, margin);
 
             contentStream.close();
@@ -85,7 +85,7 @@ public class PdfService {
             try {
                 document.close();
             } catch (IOException e) {
-                // Log dell'errore
+
             }
         }
     }

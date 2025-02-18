@@ -26,9 +26,6 @@ public class AppuntamentoService {
     @Autowired
     private GoogleCalendarService googleCalendarService;
 
-    /**
-     * Crea un nuovo appuntamento, salvando anche il numero di telefono.
-     */
     public Appuntamento createAppuntamento(String titolo,
                                            LocalDateTime dataOra,
                                            String luogo,
@@ -40,7 +37,7 @@ public class AppuntamentoService {
                                            String username,
                                            String telefono) {
 
-        // Verifica conflitti: controlla se esiste già un appuntamento entro 15 minuti
+
         LocalDateTime startInterval = dataOra.minusMinutes(15);
         LocalDateTime endInterval = dataOra.plusMinutes(15);
         List<Appuntamento> conflict = appuntamentoRepository.findByDataOraBetween(startInterval, endInterval);
@@ -48,11 +45,10 @@ public class AppuntamentoService {
             throw new IllegalStateException("Orario non disponibile. Deve esserci almeno un intervallo di 15 minuti tra gli appuntamenti.");
         }
 
-        // Recupera l'utente che sta creando l'appuntamento
         AppUser utente = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
 
-        // Crea l'oggetto Appuntamento
+
         Appuntamento appuntamento = new Appuntamento();
         appuntamento.setTitolo(titolo);
         appuntamento.setDataOra(dataOra);
@@ -62,13 +58,13 @@ public class AppuntamentoService {
         appuntamento.setCognome(cognome);
         appuntamento.setStato(stato);
         appuntamento.setEmail(email);
-        appuntamento.setTelefono(telefono); // Imposta il numero di telefono
+        appuntamento.setTelefono(telefono);
         appuntamento.setUtente(utente);
 
-        // Salva l'appuntamento nel database
+
         Appuntamento savedAppuntamento = appuntamentoRepository.save(appuntamento);
 
-        // Invia email di conferma (opzionale)
+
         String subject = "Conferma Appuntamento: " + titolo;
         String body = String.format("Ciao %s,\n\nIl tuo appuntamento è stato confermato per il %s alle ore %s presso %s.\n\nDescrizione: %s\n\nGrazie,\nPatronato Gestionale",
                 nome, dataOra.toLocalDate(), dataOra.toLocalTime(), luogo, descrizione);
@@ -77,9 +73,7 @@ public class AppuntamentoService {
         return savedAppuntamento;
     }
 
-    /**
-     * Aggiorna un appuntamento esistente, inclusi il numero di telefono e gli altri campi.
-     */
+
     public Appuntamento updateAppuntamento(Long id,
                                            String titolo,
                                            LocalDateTime dataOra,
@@ -99,11 +93,11 @@ public class AppuntamentoService {
         appuntamento.setCognome(cognome);
         appuntamento.setStato(stato);
         appuntamento.setEmail(email);
-        appuntamento.setTelefono(telefono); // Aggiorna il numero di telefono
+        appuntamento.setTelefono(telefono);
 
         Appuntamento updatedAppuntamento = appuntamentoRepository.save(appuntamento);
 
-        // Invia email di aggiornamento (opzionale)
+
         String subject = "Aggiornamento Appuntamento: " + titolo;
         String body = String.format("Ciao %s,\n\nIl tuo appuntamento è stato aggiornato:\n\nData: %s\nOrario: %s\nLuogo: %s\nStato: %s\n\nGrazie,\nPatronato Gestionale",
                 nome, dataOra.toLocalDate(), dataOra.toLocalTime(), luogo, stato);
@@ -121,7 +115,7 @@ public class AppuntamentoService {
         Appuntamento appuntamento = getAppuntamentoById(id);
         appuntamentoRepository.deleteById(id);
 
-        // Invia email di cancellazione (opzionale)
+
         String subject = "Cancellazione Appuntamento: " + appuntamento.getTitolo();
         String body = String.format("Ciao %s,\n\nIl tuo appuntamento per il %s alle ore %s presso %s è stato cancellato.\n\nGrazie,\nPatronato Gestionale",
                 appuntamento.getNome(), appuntamento.getDataOra().toLocalDate(), appuntamento.getDataOra().toLocalTime(), appuntamento.getLuogo());

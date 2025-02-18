@@ -15,7 +15,7 @@ public class NoteService {
     @Autowired
     private NoteRepository noteRepository;
 
-    // Crea una nuova nota
+
     public Note createNote(Note note) {
         if (note.getCreatedAt() == null) {
             note.setCreatedAt(LocalDateTime.now());
@@ -23,7 +23,7 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
-    // Aggiorna una nota esistente (non modifica il proprietario)
+
     public Optional<Note> updateNote(Long id, Note note) {
         return noteRepository.findById(id).map(existingNote -> {
             existingNote.setText(note.getText());
@@ -32,7 +32,7 @@ public class NoteService {
         });
     }
 
-    // Cancella una nota
+
     public boolean deleteNote(Long id) {
         if (noteRepository.existsById(id)) {
             noteRepository.deleteById(id);
@@ -41,7 +41,7 @@ public class NoteService {
         return false;
     }
 
-    // Trova le note in base alla data e all'utente
+
     public List<Note> findNotesByDateAndUser(LocalDate date, String username) {
         return noteRepository.findByDateAndUsername(date, username);
     }

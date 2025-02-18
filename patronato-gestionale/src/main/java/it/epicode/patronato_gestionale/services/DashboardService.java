@@ -1,7 +1,7 @@
 package it.epicode.patronato_gestionale.services;
 
 import it.epicode.patronato_gestionale.entities.Pratica;
-import it.epicode.patronato_gestionale.entities.Appuntamento;
+
 import it.epicode.patronato_gestionale.enums.StatoPratica;
 import it.epicode.patronato_gestionale.repositories.PraticaRepository;
 import it.epicode.patronato_gestionale.repositories.AppuntamentoRepository;

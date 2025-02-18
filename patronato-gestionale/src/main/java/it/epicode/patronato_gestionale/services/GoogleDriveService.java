@@ -23,7 +23,7 @@ import java.util.Collections;
 @Service
 public class GoogleDriveService {
 
-    // Rimuovi "final" per poter assegnare il valore successivamente
+
     private Drive driveService;
 
     @Value("${google.drive.folder.id}")
@@ -32,13 +32,13 @@ public class GoogleDriveService {
     @Value("${google.drive.credentials.json}")
     private String driveCredentialsJson;
 
-    // Costruttore vuoto; l'inizializzazione avviene in init()
+
     public GoogleDriveService() {
     }
 
     @PostConstruct
     private void init() throws GeneralSecurityException, IOException {
-        // Converti il contenuto della variabile d'ambiente in InputStream
+
         InputStream inputStream = new ByteArrayInputStream(
                 driveCredentialsJson.getBytes(StandardCharsets.UTF_8)
         );
@@ -47,7 +47,7 @@ public class GoogleDriveService {
 
         HttpRequestInitializer requestInitializer = new HttpCredentialsAdapter(credentials);
 
-        // Inizializza il servizio Google Drive
+
         this.driveService = new Drive.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(),
@@ -64,7 +64,7 @@ public class GoogleDriveService {
         fileMetadata.setName(file.getOriginalFilename());
         fileMetadata.setParents(Collections.singletonList(folderId));
 
-        // Crea un file temporaneo per il caricamento
+
         java.io.File tempFile = java.io.File.createTempFile("upload_", ".pdf");
         file.transferTo(tempFile);
 
@@ -75,13 +75,13 @@ public class GoogleDriveService {
                 .setFields("id")
                 .execute();
 
-        // Imposta il file come visibile pubblicamente
+
         Permission permission = new Permission()
                 .setType("anyone")
                 .setRole("reader");
         driveService.permissions().create(uploadedFile.getId(), permission).execute();
 
-        // Restituisce il link al file su Google Drive
+
         return "https://drive.google.com/file/d/" + uploadedFile.getId() + "/view?usp=sharing";
     }
 }

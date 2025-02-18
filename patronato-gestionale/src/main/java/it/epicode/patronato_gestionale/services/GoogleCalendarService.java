@@ -27,7 +27,7 @@ public class GoogleCalendarService {
     private static final String GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar";
 
 
-    // Leggi il contenuto del JSON direttamente dalla variabile d'ambiente (passata come proprietà)
+
     @Value("${google.calendar.credentials.json}")
     private String credentialsJson;
 
@@ -53,7 +53,6 @@ public class GoogleCalendarService {
 
 
     public List<Event> getEvents() throws GeneralSecurityException, IOException {
-        System.out.println("📌 [DEBUG] Recupero eventi dal calendario...");
         Calendar service = getCalendarService();
 
         Events events = service.events().list(calendarId)
@@ -68,7 +67,6 @@ public class GoogleCalendarService {
 
     public Event createEvent(String summary, String location, String description,
                              String startDateTime, String endDateTime) throws GeneralSecurityException, IOException {
-        System.out.println("📌 [DEBUG] Creazione evento: " + summary);
         Calendar service = getCalendarService();
 
         Event event = new Event()

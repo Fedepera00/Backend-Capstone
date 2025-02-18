@@ -26,9 +26,6 @@ public class PraticaService {
     @Autowired
     private GoogleDriveService googleDriveService;
 
-    /**
-     * ✅ Metodo aggiunto per ottenere pratiche paginabili
-     */
     public Page<Pratica> getPratichePaginate(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return praticaRepository.findAll(pageable);
@@ -78,9 +75,6 @@ public class PraticaService {
         praticaRepository.deleteById(id);
     }
 
-    /**
-     * ✅ Carica il PDF su Google Drive e salva il link nella pratica
-     */
     public String uploadPdf(Long id, MultipartFile file) throws Exception {
         Pratica pratica = getPraticaById(id);
 
@@ -88,31 +82,21 @@ public class PraticaService {
             throw new IllegalArgumentException("Il file è vuoto!");
         }
 
-        // Esempio di controllo basato sull'estensione del filename
+
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
             throw new IllegalArgumentException("Il file deve essere un PDF valido");
         }
 
-        // Oppure, se preferisci usare il content type, puoi usare:
-        // String contentType = file.getContentType();
-        // if (contentType == null || (!contentType.equals("application/pdf") && !contentType.equals("application/octet-stream"))) {
-        //     throw new IllegalArgumentException("Il file deve essere un PDF valido");
-        // }
-
-        // Carica il file su Google Drive e ottiene il link
         String fileLink = googleDriveService.uploadFile(file);
 
-        // Salva il link su Google Drive nella pratica
+
         pratica.setDriveUrl(fileLink);
         praticaRepository.save(pratica);
 
         return fileLink;
     }
 
-    /**
-     * ✅ Recupera il link pubblico del PDF associato alla pratica
-     */
     public String getPdfLink(Long id) {
         Pratica pratica = getPraticaById(id);
 
@@ -123,9 +107,6 @@ public class PraticaService {
         return pratica.getDriveUrl();
     }
 
-    /**
-     * ✅ Cerca pratiche filtrando per titolo, richiedente, stato e data di creazione
-     */
     public List<Pratica> searchPratiche(String title, String requester, String status, LocalDate date) {
         return praticaRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
