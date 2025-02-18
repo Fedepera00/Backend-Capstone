@@ -5,6 +5,7 @@ import it.epicode.patronato_gestionale.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,9 @@ public class NoteService {
 
     // Crea una nuova nota
     public Note createNote(Note note) {
+        if (note.getCreatedAt() == null) {
+            note.setCreatedAt(LocalDateTime.now());
+        }
         return noteRepository.save(note);
     }
 
