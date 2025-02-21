@@ -60,7 +60,7 @@ public class GoogleCalendarService {
                 .setSingleEvents(true)
                 .execute();
 
-        System.out.println("✅ [DEBUG] Numero di eventi trovati: " + events.getItems().size());
+
         return events.getItems();
     }
 
@@ -88,7 +88,7 @@ public class GoogleCalendarService {
 
         event = service.events().insert(calendarId, event).execute();
 
-        System.out.println("✅ [SUCCESSO] Evento creato con successo: " + event.getHtmlLink());
+
         return event;
     }
 }

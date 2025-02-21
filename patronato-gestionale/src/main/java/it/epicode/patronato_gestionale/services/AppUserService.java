@@ -1,8 +1,11 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.services;
 
+import it.epicode.patronato_gestionale.auth.JwtTokenUtil;
 import it.epicode.patronato_gestionale.dto.UpdateUserRequest;
+import it.epicode.patronato_gestionale.entities.AppUser;
 import it.epicode.patronato_gestionale.enums.Role;
 import it.epicode.patronato_gestionale.dto.AppUserDTO;
+import it.epicode.patronato_gestionale.repositories.AppUserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

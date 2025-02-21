@@ -1,6 +1,5 @@
 package it.epicode.patronato_gestionale.entities;
 
-import it.epicode.patronato_gestionale.auth.AppUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;

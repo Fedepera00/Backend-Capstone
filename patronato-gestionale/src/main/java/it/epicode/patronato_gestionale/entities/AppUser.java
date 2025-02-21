@@ -1,4 +1,4 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.entities;
 
 import it.epicode.patronato_gestionale.enums.Role;
 import jakarta.persistence.*;

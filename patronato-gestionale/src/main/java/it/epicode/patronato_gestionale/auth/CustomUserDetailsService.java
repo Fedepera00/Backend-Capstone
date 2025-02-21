@@ -1,5 +1,7 @@
 package it.epicode.patronato_gestionale.auth;
 
+import it.epicode.patronato_gestionale.entities.AppUser;
+import it.epicode.patronato_gestionale.repositories.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

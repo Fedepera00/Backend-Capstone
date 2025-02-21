@@ -1,7 +1,7 @@
 package it.epicode.patronato_gestionale.services;
 
-import it.epicode.patronato_gestionale.auth.AppUser;
-import it.epicode.patronato_gestionale.auth.AppUserRepository;
+import it.epicode.patronato_gestionale.entities.AppUser;
+import it.epicode.patronato_gestionale.repositories.AppUserRepository;
 import it.epicode.patronato_gestionale.entities.Appuntamento;
 import it.epicode.patronato_gestionale.repositories.AppuntamentoRepository;
 import jakarta.persistence.EntityNotFoundException;

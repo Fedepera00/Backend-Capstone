@@ -14,8 +14,10 @@ public class MailConfig {
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        System.out.println("MAIL_USERNAME: " + System.getenv("MAIL_USERNAME"));
-        System.out.println("MAIL_PASSWORD: " + System.getenv("MAIL_PASSWORD"));
+        // RIMOSSI i System.out.println() con credenziali
+        // Se serve il debug in locale, tienili commentati o loggali con un livello appropriato
+        // System.out.println("MAIL_USERNAME: + System.getenv("MAIL_USERNAME"));
+        // System.out.println("MAIL_PASSWORD: + System.getenv("MAIL_PASSWORD"));
 
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
@@ -27,9 +29,12 @@ public class MailConfig {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        props.put("mail.debug", "true");
 
-        System.out.println("JavaMailSender configurato con successo.");
+        // Disabilita il debug di JavaMail
+        props.put("mail.debug", "false");
+
+        // System.out.println("JavaMailSender configurato con successo."); // Se vuoi, rimuovi o commenta
+
         return mailSender;
     }
 }

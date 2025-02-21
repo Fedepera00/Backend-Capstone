@@ -1,8 +1,11 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.controllers;
 
+import it.epicode.patronato_gestionale.services.AppUserService;
 import it.epicode.patronato_gestionale.dto.AppUserDTO;
 import it.epicode.patronato_gestionale.dto.PageDTO;
+import it.epicode.patronato_gestionale.entities.AppUser;
 import it.epicode.patronato_gestionale.enums.Role;
+import it.epicode.patronato_gestionale.repositories.AppUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

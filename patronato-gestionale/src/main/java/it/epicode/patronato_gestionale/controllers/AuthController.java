@@ -1,7 +1,12 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.controllers;
 
+import it.epicode.patronato_gestionale.auth.AuthResponse;
+import it.epicode.patronato_gestionale.auth.LoginRequest;
+import it.epicode.patronato_gestionale.auth.RegisterRequest;
 import it.epicode.patronato_gestionale.dto.UpdateUserRequest;
+import it.epicode.patronato_gestionale.entities.AppUser;
 import it.epicode.patronato_gestionale.enums.Role;
+import it.epicode.patronato_gestionale.services.AppUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

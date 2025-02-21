@@ -1,13 +1,13 @@
 package it.epicode.patronato_gestionale.auth;
 
 import it.epicode.patronato_gestionale.enums.Role;
+import it.epicode.patronato_gestionale.services.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Component

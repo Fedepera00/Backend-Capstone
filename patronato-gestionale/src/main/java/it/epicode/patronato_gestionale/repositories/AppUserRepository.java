@@ -1,6 +1,7 @@
-package it.epicode.patronato_gestionale.auth;
+package it.epicode.patronato_gestionale.repositories;
 
 
+import it.epicode.patronato_gestionale.entities.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
